@@ -1,0 +1,10 @@
+In this paper, we have presented LM, a new linear logic programming language designed with concurrency in mind. LM is a bottom-up logic programming language
+that can naturally model state due to its foundations on linear logic. While it is targeted to solve graph-based algorithms, it can also model other
+types of programs as long as the problem can be mapped to a graph.
+
+We presented several programs written in LM that show the viability of a linear logic based programming language to solve interesting problems. Our experimental
+results show that LM programs can run efficiently and scale well on multicore architectures, freeing the programmer from known pitfalls in parallel programming.
+
+We also gave an overview of the formal system behind LM, namely, the fragment of linear logic used in the language, along with the high level and low level dynamic semantics.
+While the former is closely tied to linear logic, the latter is closer to a real implementation. The low level dynamic semantics can be used as a blue print for someone that
+intends to implement our language, since it also informed the design of our virtual machine.

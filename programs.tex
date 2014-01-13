@@ -1,0 +1,75 @@
+
+We now present several LM programs in order to show that they tend to be concise and
+easy to write. We also want to make clear how the language facilities can be used to solve more
+complicated algorithms, including the quick-sort algorithm that at the first glance does not seem
+to fit in the LM paradigm.
+
+\subsection{Bipartiteness Checking}
+
+The problem of checking if a graph is bipartite can be seen as a 2-color graph coloring problem.
+The code for this algorithm is shown in Fig.~\ref{code:bichecking}. All nodes in the graph
+start as \texttt{unchecked}, because they do not have a color yet. The axiom \texttt{visit(@1, 1)} is
+instantiated at node \texttt{@1} (line 9) in order to color this node with color 1.
+
+If a node is \texttt{unchecked} and needs to be marked with a color \texttt{P} then the rule in
+lines 11-12 is applied. We consume the \texttt{unchecked} fact and derive a \texttt{checked(A, P)}
+to effectively color the node with \texttt{P}. We also derive \texttt{visit(B, next(P))} in
+our neighbor nodes in order to color them with the other color.
+
+The coloring can fail if a node is already colored with a color \texttt{P} and needs to be colored
+with a different color (line 15) or if it has already failed (line 16).
+
+\subsection{N Queens}
+
+The N queens~\cite{8queens} puzzle is the problem of placing N chess queens on an NxN chessboard so
+that no pair of two queens attack each other. The specific challenge of finding all the distinct
+solutions to this problem is a good benchmark in designing parallel algorithms. The LM solution is presented
+in Fig.~\ref{code:nqueens}.
+
+First, we consider each cell of the chessboard as a node
+that can communicate with the adjacent left (\texttt{left}), right (\texttt{right}) and left (\texttt{down-left}) and right (\texttt{down-right}) bottom cells.
+For instance, the node at cell (0, 3) (fourth cell from the top-left cell) will connect
+to cells (0, 2), (0, 4) and also (1, 1) and (1, 5), respectively.
+The states are represented as a list of integers, where each integer is the column number where
+the queen was placed. For example $[2, 0]$ means that a queen is placed in cell $(0, 0)$ and another in cell $(1, 2)$.
+
+An empty state is instantiated in the top-left node (0, 0) and is then propagated to all nodes in the same row (lines 20-22).
+Every node will then check if a queen can be placed on their cell. If true, each node will send the new
+state to the row below (line 63-65).
+Recursively, when a node receives a new state, it will (i) send the state to the left
+or to the right and (ii) try to place the queen in its cell (by using \texttt{test-y}, \texttt{test-diag-left} and \texttt{test-diag-right}). With this method,
+all states will be computed since we have facts for each valid state
+at that point. When a cell cannot place a queen, that state is deleted (lines 31, 42 and 54).
+When the program ends, the states will be placed in the bottom row (lines 59-61).
+
+We find our solution very elegant, since it can be easily distributed or executed in parallel. To the best of our knowledge it is also an unusual approach to this problem.
+
+\subsection{Quick-Sort}
+
+The quick-sort algorithm is a divide and conquer sorting algorithm that works by splitting
+a list of items into two sublists and then recursively sorting the two sublists.
+To split the list, we pick a pivot element and put the items that are smaller than the pivot
+into the first sublist and items greater than the pivot into the second list.
+
+The quick-sort algorithm is interesting because it does not map immediately to the graph-based
+model of LM. Our approach considers that the program starts with a single node where
+the initial list is located. Then we split the list as usual and create two nodes
+that will recursively sort the sublists. Interestingly, this will create a tree
+that will look similar to a call tree in a functional language.
+
+Fig.~\ref{code:quicksort} presents the code for the quick-sort algorithm in LM.
+For each sublist to sort, we start with a \texttt{down} fact that must be (eventually)
+transformed into an \texttt{up} fact, where the sublist in the \texttt{up} fact is sorted.
+In line 11 we start with the initial list at node \texttt{@0}. Lines 13-16 will immediately
+sort the list when the number of items is very small. Otherwise, we apply the rule in line 17.
+\texttt{buildpivot} will first split the list using the pivot \texttt{X} using rules in
+lines 23-26. When there is nothing more to split, we apply the rule in lines 19-21
+that uses an exists constructor to create nodes \texttt{B} and \texttt{C}. The sublists
+are then sent to these nodes using \texttt{down} facts. Note, however, that we also
+derive \texttt{back} facts, that will be used to send the sorted list back using the rule
+in line 40.
+
+When the sublists are finally sorted, we get two \texttt{sorted} facts that will match
+against \texttt{waitpivot} in the rule located in lines 28-31. The sorted sublists
+are appended and then an \texttt{up} fact is finally derived (line 37).
+

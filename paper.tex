@@ -1,0 +1,82 @@
+\documentclass{new_tlp}
+%\nocite{*}% includes all entries of BibTeX database into the list of references.
+
+%%% Macros for the guide only %%%
+\hyphenation{either}
+\usepackage{url}
+%\usepackage{amsthm}
+\usepackage{fancyvrb}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{proof-dashed}
+
+\input{fp-macros}
+\providecommand\AMSLaTeX{AMS\,\LaTeX}
+\newcommand\eg{\emph{e.g.}\ }
+\newcommand\etc{\emph{etc.}}
+\newcommand\bcmdtab{\noindent\bgroup\tabcolsep=0pt%
+  \begin{tabular}{@{}p{10pc}@{}p{20pc}@{}}}
+\newcommand\ecmdtab{\end{tabular}\egroup}
+\newcommand\rch[1]{$\longrightarrow\rlap{$#1$}$\hspace{1em}}
+\newcommand\lra{\ensuremath{\quad\longrightarrow\quad}}
+\newcommand{\cmu}{\ensuremath{^\dag}}
+\newcommand{\fcup}{\ensuremath{^\ddag}}
+
+\title[Theory and Practice of Logic Programming]
+{A Linear Logic Programming Language for Parallel Programming over Graph Structures}
+
+\author[Flavio Cruz, Ricardo Rocha, Seth Copen Goldstein and Frank Pfenning]
+       {Flavio Cruz\cmu\fcup, Ricardo Rocha\fcup, Seth Copen Goldstein\cmu, Frank Pfenning\cmu\\
+       \cmu Carnegie Mellon University, Pittsburgh, PA 15213\\
+       \email{{fmfernan, seth, fp}@cs.cmu.edu} \\
+       \fcup CRACS \& INESC TEC, Faculty of Sciences, University Of Porto\\
+       Rua do Campo Alegre, 1021/1055, 4169-007 Porto, Portugal\\
+       \email{ricroc@dcc.fc.up.pt}}
+
+\jdate{January 2014}
+\pubyear{2014}
+\pagerange{\pageref{firstpage}--\pageref{lastpage}}
+
+\newtheorem{lemma}{Lemma}[section]
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\input{abstract}
+\end{abstract}
+
+\begin{keywords}
+   Linear Logic, Logic Programming, Parallel Programming, Distributed Programming
+\end{keywords}
+
+%\tableofcontents
+
+\section{Introduction}
+\input{introduction}
+
+\section{Related Work}
+\input{related}
+
+\section{The LM Language}
+\input{language}
+
+\section{LM Programs}
+\input{programs}
+
+\section{Proof Theory}
+\input{proofs}
+
+\section{Closing Remarks}
+\input{conclusion}
+
+\bibliographystyle{acmtrans}
+\bibliography{refs}
+
+\clearpage
+\appendix
+\input{appendix}
+
+\end{document}
