@@ -127,15 +127,13 @@ Each fact is an association between a \emph{predicate} and a tuple of values. A 
 also allowed.
 
 \subsection{Comprehensions}
+
 Sometimes we need to consume a linear fact and then immediately generate several facts depending on
 the contents of the database. To solve this particular need, we created the concept of comprehensions, which are
-sub-rules that are applied with all possible combinations of facts from the database. In a comprehension $\{ \; \widehat{x} \; | \; BE \; | \; HE \; \}$,
-$\widehat{x}$ is a list of variables, $BE$ is the body of the comprehension and $HE$ is the head.
+sub-rules that are applied with all possible combinations of facts from the database. In a comprehension $\{ \; \widehat{x} \; | \; BE \; | \; HE \; \}$, $\widehat{x}$ is a list of variables, $BE$ is the body of the comprehension and $HE$ is the head.
 The body $BE$ is used to generate all possible combinations for the head $HE$, according to the facts
-in the database.
-We have already seen an example of comprehensions in the visit program (Fig.~\ref{code:visit} line 8).
-Here, we match \texttt{!edge(A, B)} using all the combinations
-available in the database and for each combination we derive \texttt{visit(B)}.
+in the database.  We have already seen an example of comprehensions in the visit program (Fig.~\ref{code:visit} line 8).
+Here, we match \texttt{!edge(A, B)} using all the combinations available in the database and for each combination we derive \texttt{visit(B)}.
 
 \subsection{Aggregates}
 

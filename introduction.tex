@@ -1,35 +1,12 @@
 
-\begin{comment}
-The last decade has seen a priority shift for processor companies. If clock frequency
-was once the main metric for performance, today computing power is measured in number of
-cores in a single chip.
-For software developers and computer scientists, once focused in developing sequential programs,
-newer hardware usually meant faster programs without any change to the source code. Today,
-the free lunch is over. Multicore processors are now forcing the development of
-new software methodologies that take advantage of increasing processing power through parallelism.
-However, parallel programming is difficult, usually because programs are written
-in imperative and stateful programming languages that make use of low level synchronization
-primitives such as locks, mutexes and barriers. This tends to make the task of managing multithreaded
-execution quite intricate and error-prone, resulting in race hazards and deadlocks.
-In the future, \emph{many-core} processors will make this task look even more daunting.
-
-Advances in network speed and bandwidth are making distributed computing
-more appealing. For instance, \emph{cloud computing} is a new emerging paradigm that wants
-to make every computer connected to the Internet as a client of a pool of computing power,
-where data can be retrieved and computation performed. From the perspective of high performance
-computing, the \emph{computer cluster} is a well established paradigm that uses fast local area
-networks to improve performance and solve problems that would take a long time with a single computer.
-\end{comment}
-
 Developments in parallel and distributed programming have given birth to several programming models.
 At the end of the spectrum are lower-level programming abstractions such as
 \emph{message passing} (e.g., MPI~\cite{gabriel04-open-mpi}) and \emph{shared memory}
 (e.g., Pthreads or OpenMP~\cite{Chapman-2007-UOP-1370966}).
 While such abstractions are very expressive and enable the programmer to write very performant code,
-they tend to be very hard to use and debug, due to synchronization problems, making it difficult to
-prove the program's correctness. On the other hand, we have many declarative programming models
-such as logic or functional programming
-that can be run in parallel~\cite{Blelloch:1996:PPA:227234.227246} and tend to be easier to reason about.
+they tend to be very hard to use and debug due to synchronization problems.
+On the other hand, we have many declarative programming models such as logic or functional programming
+that can be run in parallel~\cite{Blelloch:1996:PPA:227234.227246} and tend to be easier to write.
 
 Due to the popularity of social networks and the explosion of the content available in the World Wide Web, there has been
 increased interest in running graph based algorithms in a distribution fashion. The sheer size of
@@ -37,22 +14,26 @@ the available datasets makes it impossible to run such algorithms in a single ma
 Most of the available frameworks developed for these kinds of algorithms are implemented as libraries on top
 of imperative programming languages and thus require knowledge of both the library and the interface, making
 the learning curve steep for unexperienced users. In turn, reasoning about the programs requires knowing how
-the library schedules execution.
+the library schedules execution and the operational semantics of the underlying language.
 
-% Falar do datalog
+Logic programming is a promising approach to implement graph based algorithms since it is a declarative paradigm
+and is less prone to the problems found in imperative programming languages.
+The P2 system~\cite{Loo-condie-garofalakis-p2}, for example, used Datalog to map nodes of a computer network
+to a graph, where each node would do computation locally and could communicate with neighbor nodes.
+This kind of programming is more amenable to proof since a program is just a set of logical clauses.
 
-We have designed a new logic programming language called LM (Linear Meld) that tackles the problems
-of parallelism and distribution in graph based algorithms.
-LM is based on the Meld language created by Ashley-Rollman et
-al~\cite{ashley-rollman-iclp09,ashley-rollman-derosa-iros07wksp}, which
-was designed to program massively distributed systems made of modular robots with a dynamic topology.
-In Meld, the distribution of computation is done by first partitioning the program state across the robots
-and then making computation local to the node.
+We have designed a new logic programming language called LM (Linear Meld) that attempts to run graph based
+algorithms in more traditional architectures such as multicores. LM is based on the Meld language created by
+Ashley-Rollman et al~\cite{ashley-rollman-iclp09,ashley-rollman-derosa-iros07wksp}, which was designed to
+program massively distributed systems made of modular robots with a dynamic topology. Meld was itself inspired
+in the P2 system because it used the same graph based model of computation but adapted to the concept of a moving
+robot.
 
-LM differs from other logic programming languages such as Datalog or Prolog for three reasons. First, we integrate both classical logic and linear logic into the language, therefore allowing some facts to be retracted and asserted in a logical fashion. Second, unlike Prolog, LM is a bottom up logic programming language (similar to Datalog) since the
-database is updated incrementally as rules are applied. Third, LM is a language created with parallelism and
-distribution in mind, being specially suited to solve graph based algorithms like machine learning problems and
-search algorithms, although it can be used to solve other kinds of problems.
+LM differs from other logic programming languages such as Datalog or Prolog for three reasons. First, we integrate both classical
+logic and linear logic into the language, allowing some facts to be retracted and asserted in a logical fashion. Second, unlike
+Prolog, LM is a bottom up logic programming language (similar to Datalog) since the database is updated incrementally as rules are
+applied. Third, LM is a language created to solve general graph based algorithms, unlike P2 or Meld which aimed to solve domain
+specific problems.
 
 In this paper we want to present the syntax and semantics of our language, explain how programs can be written
 and what novel ideas LM brings to the table. We identify three key contributions of our work:

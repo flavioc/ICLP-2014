@@ -1,16 +1,14 @@
-There is an increased interested in executing graph based algorithms concurrently.
-Systems such as Pregel~\cite{Malewicz:2010:PSL:1807167.1807184} or GraphLab~\cite{GraphLab2010}
-are specialized frameworks for programming and
-executing algorithms over graph structures. Although these frameworks make it significantly easier to write
-those kinds of programs, they tend to have a steep learning curve because they use low level languages
-such as C++. We have designed a logic programming language for programming graph based algorithms
-in a high level fashion. 
-Logic programming is a form of declarative programming that uses proof search as a computation
-mechanism. Logic based languages use logical clauses to drive computation, which makes them
-be both easier to write and to reason about.
-Since our language is based on linear logic, a powerful logical system where logical facts can be removed,
-our programs tend to be more expressive than in other logic programming languages.
-Programs are mapped to an underlying graph structure where sequential computation is performed at the node level
-and communication takes place when nodes send facts to each other.
-We have implemented several search algorithms and machine
-learning algorithms and have seen good scalability results on multicore machines.
+Due to the popularity of social networks and the internet, there has been an increased interested
+in executing graph based algorithms concurrently. Systems such as Pregel~\cite{Malewicz:2010:PSL:1807167.1807184}
+or GraphLab~\cite{GraphLab2010} are specialized frameworks for programming and executing algorithms
+over graph structures. Although these frameworks make it significantly easier to write those kinds
+of programs, they tend to have a steep learning curve because they use low level languages such as
+C++. We have designed a logic programming language for programming graph based algorithms in a high
+level fashion. Logic programming is a form of declarative programming that uses proof search as a
+computation mechanism. Logic based languages use logical clauses to drive computation, which makes
+them be both easier to write and to reason about.  Since our language is based on linear logic, a
+powerful logical system where logical facts can be removed, our programs tend to be more expressive
+than in other logic programming languages. Programs are mapped to an underlying graph structure where
+sequential computation is performed at the node level and communication takes place when nodes send
+facts to each other. We have implemented several search algorithms and machine learning algorithms
+and have seen good scalability results on multicore machines.
