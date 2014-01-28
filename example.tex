@@ -1,0 +1,84 @@
+
+Linear Meld (LM) is a \emph{forward chaining} logic programming language in the style of Datalog~\cite{Ullman:1990:PDK:533142}. The program is defined as a \emph{database of facts} and a set of \emph{derivation rules}.
+Initially, we populate the database with the program's axioms and then determine which derivation rules can be applied by using the current database. Once a rule is applied, we derive new facts, which are then added to the database.
+If a rule uses linear facts, they are consumed and thus deleted from the database.
+The program stops when we reach \emph{quiescence}, that is, when we can no longer
+apply any derivation rule.
+
+The database of facts can be seen as a graph data structure where each node or vertex contains a
+fraction of the database.  Since derivation rules can only manipulate facts belonging to
+a node, we are able to perform independent rule derivations.
+
+Our first program example is shown in Fig.~\ref{code:message}. This is a message routing program
+that simulates message transmission through a network of nodes.
+We first declare all the predicates (lines 1-2), which represent the kinds of facts we are going to
+use. The first argument of every predicate must be typed as a \texttt{node}, which represents the location of the fact in
+the graph data structure. Predicate \texttt{edge/2} is a non \texttt{linear} (persistent) predicate while \texttt{message/3} is linear.
+The second argument of \texttt{message/2} is the message content represented as a \texttt{string}
+while the third argument is the route list.
+
+The program rules are declared in lines 4-9, while the program's axioms are written in lines 11-12.
+When persistent facts are used in rules (line 5) they must be
+preceded by \texttt{!}. This helps the programmer in distinguishing between persistent facts and linear facts.
+
+\begin{figure}[h!]
+\small\begin{Verbatim}[numbers=left]
+type edge(node, node).
+type linear message(node, string, list node).
+
+message(A, Content, [B | L]),
+!edge(A, B)
+   -o message(B, Content, L).
+
+message(A, Content, [])
+   -o 1.
+
+!edge(@1, @2). !edge(@2, @3). !edge(@3, @4). !edge(@1, @3).
+message(@1, 'Hello World', [@3, @4]).
+\end{Verbatim}
+\caption{Message program.}
+  \label{code:message}
+\end{figure}
+
+The first rule (lines 4-6) grabs the next node in the route list (third argument of \texttt{message}) and
+ensures that a communication edge exists (through \texttt{edge(A, B)}).
+A new \texttt{message(B,~Content,~L)} fact is derived at node \texttt{B}.
+When the route list is empty, the message has reached its destination and thus it is consumed
+(rule in lines 8-9). Note that \texttt{1} in the head of the rule means that nothing is derived.
+
+\begin{figure}[h!]
+\small\begin{Verbatim}[numbers=left]
+type edge(node, node).
+type linear visit(node).
+type linear unvisited(node).
+type linear visited(node).
+
+// the program rules
+visit(A), unvisited(A) -o
+   visited(A), {B | !edge(A, B) | visit(B)}.
+
+visit(A), visited(A) -o visited(A).
+
+// axioms: the input data
+!edge(@1, @2). !edge(@2, @3). !edge(@1, @4). !edge(@2, @4).
+unvisited(@1). unvisited(@2). unvisited(@3). unvisited(@4).
+
+visit(@1).
+\end{Verbatim}
+  \caption{Visit program.}
+  \label{code:visit}
+\end{figure}
+\normalsize
+
+Figure~\ref{code:visit} presents another complete LM program that, for a given graph
+of nodes, performs a visit to all nodes reachable from node $@1$.
+The first rule of the program (lines 7-8) is fired when a node has a \texttt{visit} and a \texttt{unvisited} fact.
+When fired, we first derive \texttt{visited} to mark node as \textit{visited} and use a
+\emph{comprehension} to go through all the edge facts and derive \texttt{visit} for each
+one (comprehensions are explained next in detail). This forces those nodes to be visited also.
+The second rule (line 10) is fired when the
+node is already visited more than once: we keep the \texttt{visited} fact and delete \texttt{visit}.
+Node $@1$ starts with the \texttt{visit(@1)} fact (line 16).
+
+If the graph is connected, it is easy to prove that every node will derive \texttt{visited},
+regardless of the order in which rules are applied.
