@@ -23,7 +23,7 @@ In this section, we present the sequent calculus of a fragment of intuitionistic
 
 \subsection{Intuitionistic Linear Logic}
 
-The fragment of linear logic used by LM is presented in Fig.~\ref{linear_logic}.
+The fragment of linear logic used by LM is presented in Appendix~\ref{linear_logic}.
 We use a standard set of connectives except the $\m{def} \; A$ connective, which is used to logically justify comprehensions and aggregates.
 The sequent calculus has the form $\Psi; \Gamma; \Delta \rightarrow C$, where $\Psi$ is the typed term context used in the quantifiers, $\Gamma$ is the multi-set
 of persistent terms, $\Delta$ is the multi-set of linear terms and $C$ is the term we want to prove.
@@ -35,7 +35,7 @@ makes it consistent.
 
 In a comprehension, we want to apply an implication as many matches as the database allows. One way to formally describe comprehensions would be to use persistent
 rules that would be used a few times and then would be forgotten. A more reasonable approach is to use
-definitions. Given a comprehension $C = \{ \; \widehat{x} \; | \; A \; | \; B \; \}$ with a body $A$ and a head $B$, then we can build the following recursive definition:
+definitions. Given a comprehension $C = \{ \; \widehat{x}; \; A; \; B \; \}$ with a body $A$ and a head $B$, then we can build the following recursive definition:
 
 \[
 \compr{C} \defeq 1 \with ((A \lolli B) \otimes \compr{C})
@@ -45,7 +45,7 @@ We can unfold $\compr{C}$ to either stop (by selecting $1$) or get a new linear 
 to apply the comprehension once. Because we also get another $\compr{C}$ by selecting the right hand side,
 the comprehension can be applied again, recursively.
 
-Aggregates work identically, but they need an extra argument to accumulate the aggregated value. If a sum aggregate $C$ has the form $[\;\m{sum} \Rightarrow y \; | \; \widehat{x} \; | \; A \; | \; B_1 \; | \; B_2 \;]$, then the definition will be as follows:
+Aggregates work identically, but they need an extra argument to accumulate the aggregated value. If a sum aggregate $C$ has the form $[\;\m{sum} \Rightarrow y; \; \widehat{x}; \; A; \; B_1; \; B_2 \;]$, then the definition will be as follows:
 
 \[
 \compr{C} \; V \defeq (\lambda v. B_2)V \with (\forall x. ((Ax \lolli B_1) \otimes \compr{C} \; (x + V)))
@@ -67,8 +67,8 @@ The aggregate is initiated as $\compr{C} \; 0$.
     $\exists x. A$               & Instantiates new node variables.                   & Head       & \texttt{exists A.(p(A, P))}          \\ 
     $A \lolli B$                 & $\lolli$ means "linearly implies".                 & Rule       & \texttt{p(A, B) $\lolli$ r(A, B)}    \\ 
                                  & $A$ is the body and $B$ is the head.               &            &                                      \\ 
-    $\m{def} A. B$               & Extension called definitions.                      & Head       & \texttt{\{B | !e(A, B) | v(B)\}}     \\ 
-                                 & Used for comprehensions and aggregates.            &            &                                      \\ \hline
+    $\m{def} A. B$               & Extension called definitions. Used for             & Head       & \texttt{\{B | !e(A, B) | v(B)\}}     \\ 
+                                 & comprehensions and aggregates.                     &            &                                      \\ \hline
     \end{tabular}}
 \caption{Connectives from Linear Logic used in LM.}
 \label{table:linear}

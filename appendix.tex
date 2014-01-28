@@ -1,6 +1,8 @@
 
 \section{Programs}
 
+\subsection{Bipartiteness Checking program}\label{code:bichecking}
+
 \begin{figure}[h!]
 \footnotesize\begin{Verbatim}[numbers=left]
 type edge(node, node).
@@ -20,63 +22,14 @@ visit(A, P), checked(A, P) -o checked(A, P).
 visit(A, P1), checked(A, P2), P1 <> P2 -o fail(A).
 visit(A, P), fail(A) -o fail(A).
 \end{Verbatim}
-  \caption{Bipartiteness Checking program.}
-  \label{code:bichecking}
 \end{figure}
 \normalsize
 
+\clearpage
+\subsection{N-Queens program}\label{code:nqueens}
 
 \begin{figure}[h!]
-\footnotesize\begin{Verbatim}[numbers=left]
-type back(node, node).
-type linear down(node, list int).
-type linear up(node, list int).
-type linear sorted(node, node, list int).
-type linear buildpivot(node, list int, int, list int, list int).
-type linear waitpivot(node, node, node, int).
-type linear append(node, list int, list int).
-type linear reverse(node, list int, list int, list int).
-type linear reverse2(node, list int, list int).
-
-down(@0, tosort).
-
-down(A, []) -o up(A, []).
-down(A, [X]) -o up(A, [X]).
-down(A, [X, Y]), X < Y -o up(A, [X, Y]).
-down(A, [X, Y]), X >= Y -o up(A, [Y, X]).
-down(A, [X | L]) -o buildpivot(A, L, X, [], []).
-
-buildpivot(A, [], X, Smaller, Greater)
-   -o exists B, C. (back(B, A), down(B, Smaller),
-            back(C, A), down(C, Greater), waitpivot(A, B, C, X)).
-
-buildpivot(A, [Y | L], X, Smaller, Greater), Y <= X
-   -o buildpivot(A, L, X, [Y | Smaller], Greater).
-buildpivot(A, [Y | L], X, Smaller, Greater), Y > X
-   -o buildpivot(A, L, X, Smaller, [Y | Greater]).
-   
-waitpivot(A, NodeSmaller, NodeGreater, Pivot),
-sorted(A, NodeSmaller, Smaller),
-sorted(A, NodeGreater, Greater)
-   -o append(A, Smaller, [Pivot | Greater]).
-
-append(A, L1, L2) -o reverse(A, L1, L2, []).
-
-reverse(A, [], L2, L3) -o reverse2(A, L3, L2).
-reverse(A, [X | L], L2, L3) -o reverse(A, L, L2, [X | L3]).
-reverse2(A, [], Result) -o up(A, Result).
-reverse2(A, [X | L1], L2) -o reverse2(A, L1, [X | L2]).
-
-up(A, L), back(A, B) -o sorted(B, A, L).
-\end{Verbatim}
-  \caption{Quick-Sort program.}
-  \label{code:quicksort}
-\end{figure}
-\normalsize
-
-
-\begin{figure}[h!]
-\footnotesize\begin{Verbatim}[numbers=left]
+\scriptsize\begin{Verbatim}[numbers=left]
 type left(node, node).
 type right(node, node).
 type down-right(node, node).
@@ -143,13 +96,60 @@ send-down(A, Nodes, Coords)
    -o {B | !down-right(A, B), B <> A | propagate-right(B, Nodes, Coords)},
       {B | !down-left(A, B), B <> A | propagate-left(B, Nodes, Coords)}.
 \end{Verbatim}
-  \caption{N-Queens program.}
-  \label{code:nqueens}
 \end{figure}
 \normalsize
 
 \clearpage
-\section{Linear Logic System}
+\subsection{Quick-Sort program}\label{code:quicksort}
+
+\begin{figure}[h!]
+\footnotesize\begin{Verbatim}[numbers=left]
+type back(node, node).
+type linear down(node, list int).
+type linear up(node, list int).
+type linear sorted(node, node, list int).
+type linear buildpivot(node, list int, int, list int, list int).
+type linear waitpivot(node, node, node, int).
+type linear append(node, list int, list int).
+type linear reverse(node, list int, list int, list int).
+type linear reverse2(node, list int, list int).
+
+down(@0, tosort).
+
+down(A, []) -o up(A, []).
+down(A, [X]) -o up(A, [X]).
+down(A, [X, Y]), X < Y -o up(A, [X, Y]).
+down(A, [X, Y]), X >= Y -o up(A, [Y, X]).
+down(A, [X | L]) -o buildpivot(A, L, X, [], []).
+
+buildpivot(A, [], X, Smaller, Greater)
+   -o exists B, C. (back(B, A), down(B, Smaller),
+            back(C, A), down(C, Greater), waitpivot(A, B, C, X)).
+
+buildpivot(A, [Y | L], X, Smaller, Greater), Y <= X
+   -o buildpivot(A, L, X, [Y | Smaller], Greater).
+buildpivot(A, [Y | L], X, Smaller, Greater), Y > X
+   -o buildpivot(A, L, X, Smaller, [Y | Greater]).
+   
+waitpivot(A, NodeSmaller, NodeGreater, Pivot),
+sorted(A, NodeSmaller, Smaller),
+sorted(A, NodeGreater, Greater)
+   -o append(A, Smaller, [Pivot | Greater]).
+
+append(A, L1, L2) -o reverse(A, L1, L2, []).
+
+reverse(A, [], L2, L3) -o reverse2(A, L3, L2).
+reverse(A, [X | L], L2, L3) -o reverse(A, L, L2, [X | L3]).
+reverse2(A, [], Result) -o up(A, Result).
+reverse2(A, [X | L1], L2) -o reverse2(A, L1, [X | L2]).
+
+up(A, L), back(A, B) -o sorted(B, A, L).
+\end{Verbatim}
+\end{figure}
+\normalsize
+
+\clearpage
+\section{Linear Logic fragment used in LM}\label{linear_logic}
 
 \begin{figure}[h]
 \[
@@ -244,7 +244,6 @@ send-down(A, Nodes, Coords)
    \Psi ; \seqnocut{\Gamma}{\Delta, B\theta}{C} & A \defeq B & A' \doteq A\theta
 }
 \]
-\caption{Linear logic fragment used in LM.}\label{linear_logic}
 \end{figure}
 
 \clearpage

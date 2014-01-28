@@ -1,163 +1,57 @@
 
-Linear Meld (LM) is a \emph{forward chaining} logic programming language in the style of Datalog~\cite{Ullman:1990:PDK:533142}. The program is defined as a \emph{database of facts} and a set of \emph{derivation rules}.
-Initially, we populate the database with the program's axioms and then determine which derivation rules can be applied by using the current database. Once a rule is applied, we derive new facts, which are then added to the database.
-If a rule uses linear facts, they are consumed and thus deleted from the database.
-The program stops when we reach \emph{quiescence}, that is, when we can no longer
-apply any derivation rules.
-
-The database of facts can be seen as a graph data structure where each node or vertex contains a
-fraction of the database.  Since derivation rules can only manipulate facts belonging to
-a node, we are able to perform independent rule derivations.
-
-Our first program example is shown in Fig.~\ref{code:message}. This is a message routing program
-that simulates message transmission through a network of nodes.
-We first declare all the predicates (lines 1-3), which represent the kinds of facts we are going to
-use. Predicate \texttt{edge/2} is a non \texttt{linear} (persistent) predicate while all the other predicates are linear.
-The second argument of the \texttt{message/2} predicate is the message content
-while the third argument is the route list. Next, we declare the program rules (lines 5-12),
-followed by the program axioms (lines 14-16).
-
-\begin{figure}[h!]
-\small\begin{Verbatim}[numbers=left]
-type edge(node, node).
-type linear message(node, int, list node).
-type linear processed(node, int).
-
-!edge(A, B),
-message(A, Content, [B | L]),
-processed(A, N)
-   -o message(B, Content, L), processed(A, N + 1).
-
-message(A, Content, []),
-processed(A, N)
-   -o processed(A, N + 1).
-
-!edge(@1, @2). !edge(@2, @3). !edge(@3, @4). !edge(@1, @3).
-processed(A, 0).
-message(@1, 42, [@3, @4]).
-\end{Verbatim}
-\caption{Message program.}
-  \label{code:message}
-\end{figure}
-
-The first rule (lines 5-9) grabs the next node in the route list (third argument of \texttt{message}) and
-ensures that a communication edge exists (through \texttt{edge(A, B)}). We increase the number of
-processed messages by consuming \texttt{processed(A, N)} and deriving \texttt{processed(A, N + 1)}.
-A new \texttt{message(B, Content, L)} fact is derived at node \texttt{B}.
-When the route list is empty, the message has reached its destination and thus it is consumed
-(rule in lines 10-12).
-Note that we only need to send one message since there is only one \texttt{message} axiom (line 16).
-
-\begin{figure}[h!]
-\small\begin{Verbatim}[numbers=left]
-type edge(node, node).
-type linear visit(node).
-type linear unvisited(node).
-type linear visited(node).
-
-// the program rules
-visit(A), unvisited(A) -o
-   visited(A), {B | !edge(A, B) | visit(B)}.
-
-visit(A), visited(A) -o visited(A).
-
-// axioms: the input data
-!edge(@1, @2). !edge(@2, @3). !edge(@1, @4). !edge(@2, @4).
-unvisited(@1). unvisited(@2). unvisited(@3). unvisited(@4).
-
-visit(@1).
-\end{Verbatim}
-  \caption{Visit program.}
-  \label{code:visit}
-\end{figure}
-\normalsize
-
-Figure~\ref{code:visit} presents another complete LM program that, for a given graph
-of nodes, performs a visit to all nodes reachable from node $@1$.
-The first rule of the program (lines 7-8) is fired when a node has a \texttt{visit} and a \texttt{unvisited} fact.
-When fired, we first derive \texttt{visited} to mark node as \textit{visited} and use a
-\emph{comprehension} to go through all the edge facts and derive \texttt{visit} for each
-one. This forces those nodes to be visited also. The second rule (line 10) is fired when the
-node is already visited more than once: we keep the \texttt{visited} fact and delete \texttt{visit}.
-Node $@1$ starts with the \texttt{visit(@1)} fact (line 16).
-
-If the graph is connected, it is easy to prove that eventually every node will derive \texttt{visited},
-regardless of the order in which rules are applied.
-
-\subsection{Syntax}
+\newcommand{\selector}[0]{[\; \m{sop} \Rightarrow y; \; BE \;] \lolli HE}
+\newcommand{\comprehension}[0]{\{ \; \widehat{x}; \; BE; \; HE \; \}}
+\newcommand{\aggregate}[0]{[\;\m{aop} \Rightarrow y; \; \widehat{x}; \; BE; \; HE_1; \; HE_2 \;]}
 
 Table~\ref{tbl:ast} shows the abstract syntax for rules in LM.
-A LM program consists of a set of derivation rules ($\Sigma$) and a database ($D$).
-Each derivation rule can be written as $BE \lolli HE$ where $BE$ is the body of the rule and
-$HE$ is the head. Rules without bodies are allowed in LM and they are called \textit{axioms} (lines 13-16 in Fig.~\ref{code:visit}). Rules without heads are also allowed.
+A LM program $Prog$ consists of a set of derivation rules $\Sigma$ and a database $D$.
+Each derivation rule $R$ can be written as $BE \lolli HE$ where $BE$ is the body of the rule and
+$HE$ is the head. We can also use rule wide variables using $\; \forall_{x}. R$, so that we can instantiate
+shared variables in the body and the head.
+In order to control how facts are selected in the body, we can use \emph{selectors} of
+the form $\selector$ (explained later).
+%Rules without bodies are allowed in LM and they are called \textit{axioms} (lines 13-16 in Fig.~\ref{code:visit}).
+%Rules without heads are also allowed.
 
 \begin{table}[h]
-   \centering
+\centering
 \begin{tabular}{ l l c l }
+  Program & $Prog$ & $::=$ & $\Sigma, D$ \\
+  Set Of Rules & $\Sigma$ & $::=$ & $\cdot \; | \; \Sigma, R$\\
+  Database & $D$ & $::=$ & $\Gamma; \Delta$ \\
+  Rules & $R$ & $::=$ & $BE \lolli HE \; | \; \forall_{x}. R \; | \; \selector$ \\
+  Body Expressions & $BE$ & $::=$ & $L \; | \; P \; | \; C \; | \; BE, BE \; | \; \exists_{x}. BE \; | \; 1$\\
+  Head Expressions & $HE$ & $::=$ & $L \; | \; P \; | \; HE, HE \; | \; EE \; | \; CE \; | \; AE \; | \; 1$\\
+  
   Linear Facts & $L$ & $::=$ & $l(\hat{x})$\\
   Persistent Facts & $P$ & $::=$ & $\bang p(\hat{x})$\\
   Constraints & $C$ & $::=$ & $c(\hat{x})$ \\
-  Action Facts & $A$ & $::=$ & $a(\hat{x})$\\
-  Sensing Facts & $S$ & $::=$ & $s(\hat{x})$\\
-  Body Expressions & $BE$ & $::=$ & $L \; | \; P \; | \; C \; | \; BE, BE \; | \; \forall_{\widehat{x}}. BE \; | \; \exists_{\widehat{x}}. BE \; | \; 1$\\
-  Comprehensions & $CE$ & $::=$ & $\{ \; \widehat{x} \; | \; BE \; | \; HE \; \}$ \\
-  Aggregates & $AE$ & $::=$ & $[\;\m{aop} \Rightarrow y \; | \; \widehat{x} \; | \; BE \; | \; HE_1 \; | \; HE_2 \;]$ \\
+  
   Exists constructs & $EE$ & $::=$ & $exists \; \widehat{x}. (HE)$ \\
-  Head Expressions & $HE$ & $::=$ & $A \; | \; L \; | \; P \; | \; HE, HE \; | \; EE \; | \; CE \; | \; AE \; | \; 1$\\
-  Rules & $R$ & $::=$ & $BE \lolli HE \; | \; [\; \m{sop} \Rightarrow y \; | \; BE \;] \lolli HE$ \\
-  Set Of Rules & $\Sigma$ & $::=$ & $\cdot \; | \; \Sigma, R$\\
+  Comprehensions & $CE$ & $::=$ & $\comprehension$ \\
+  Aggregates & $AE$ & $::=$ & $\aggregate$ \\
+  
   Known Linear Facts & $\Delta$ & $::=$ & $\cdot \; | \; \Delta, l(\hat{t})$ \\
   Known Persistent Facts & $\Gamma$ & $::=$ & $\cdot \; | \; \Gamma, \bang p(\hat{t})$ \\
-  Database & $D$ & $::=$ & $\Gamma; \Delta$ \\
 \end{tabular}
 \caption{Abstract syntax of LM.}\label{tbl:ast}
 \end{table}
 
-The body of the rule ($BE$) contains \emph{fact expressions} ($L$ and $P$) and
-constraints ($C$). Fact expressions are template facts that instantiate variables
-(from facts in the database)
-such as \texttt{visit(A)} in line 10 in Fig.~\ref{code:visit}. Variables can be used again in the body for matching and
-also in the head when instantiating facts. Constraints are boolean expressions that must
-be true in order for the rule to be fired. Constraints use variables from fact expressions and are built using a small functional language that includes mathematical operations, boolean operations, external functions and literal values.
+The body of the rule $BE$ contains linear ($L$) and persistent ($P$) \emph{fact expressions} and
+constraints ($C$). We can chain those elements by using $BE, BE$ or introduce body variables using $\exists_{x}. BE$.
+Alternatively we can use an empty body by using $1$, which creates an axiom.
 
-The head of a rule ($HE$) contains \emph{fact templates} ($L$ and $P$) which are uninstantiated facts and will derive new facts. The head can also have \emph{exist constructs} ($EE$), \emph{comprehensions} ($CE$) and \emph{aggregates} ($AE$). All those constructs
-may use all the variables instantiated in the body.
+Fact expressions are template facts that instantiate variables
+(from facts in the database) such as \texttt{visit(A)} in line 10 in Fig.~\ref{code:visit}.
+Constraints are boolean expressions that must
+be true in order for the rule to be fired (example \texttt{C~=~A~+~B}). Constraints use variables from fact expressions and are built using a small functional language that includes mathematical operations, boolean operations, external functions and literal values.
+
+The head of a rule ($HE$) contains linear ($L$) and persistent ($P$) \emph{fact templates} which are uninstantiated facts and will derive new facts. The head can also have \emph{exist constructs} ($EE$), \emph{comprehensions} ($CE$) and \emph{aggregates} ($AE$). All those constructs
+may use all the variables instantiated in the body. We can also use an empty head by choosing $1$.
 
 Each fact is an association between a \emph{predicate} and a tuple of values. A predicate is a pair with a name and a tuple of types (the argument types). LM rules are type-checked using the predicate declarations in the header of the program. LM has a simple type system that includes the following simples types: \emph{node}, \emph{int}, \emph{float}, \emph{string}, \emph{bool}. Recursive types such as \emph{list X} and \emph{pair X; Y} are
 also allowed.
 
-\subsection{Comprehensions}
-
-Sometimes we need to consume a linear fact and then immediately generate several facts depending on
-the contents of the database. To solve this particular need, we created the concept of comprehensions, which are
-sub-rules that are applied with all possible combinations of facts from the database. In a comprehension $\{ \; \widehat{x} \; | \; BE \; | \; HE \; \}$, $\widehat{x}$ is a list of variables, $BE$ is the body of the comprehension and $HE$ is the head.
-The body $BE$ is used to generate all possible combinations for the head $HE$, according to the facts
-in the database.  We have already seen an example of comprehensions in the visit program (Fig.~\ref{code:visit} line 8).
-Here, we match \texttt{!edge(A, B)} using all the combinations available in the database and for each combination we derive \texttt{visit(B)}.
-
-\subsection{Aggregates}
-
-Another useful feature in logic programs is the ability to reduce several facts into a single fact.
-In LM we have aggregates ($AE$), a special kind of sub-rule that work very similarly to comprehensions.
-In the abstract syntax $[\;\m{aop} \Rightarrow y \; | \; \widehat{x} \; | \; BE \; | \; HE_1 \; |
-\; HE_2 \;]$, $\m{aop}$ is the aggregate operation, $\widehat{x}$ is the list of variables
-introduced in $BE$, $HE_1$ and $HE_2$ and $y$ is the variable in the body
-$BE$ that represents the values to be aggregated using $\m{aop}$. Like for comprehensions,
-we use $\widehat{x}$ to try all the combinations of $BE$, but, in addition to deriving $HE_1$ for each combination,
-we aggregate the values represented by $y$ and derive $HE_2$ only once using $y$.
-
-To understand aggregates, let's consider a database with the following facts and a rule:
-
-\begin{Verbatim}
-price(@1, 3). price(@1, 4). price(@1, 5).
-count-prices(@1).
-count-prices(A) -o [:sum => P | price(A, P) | | total(A, P)].
-\end{Verbatim}
-
-By applying the rule, we consume \texttt{count-prices(@1)} and
-derive the aggregate which consumes all the \texttt{price(@1, P)} facts.
-These are added and \texttt{total(@1,~12)} is derived since \texttt{P~=~12}.
-LM provides several aggregate operations, including the minimum, maximum, sum, and count.
 
 \subsection{Selectors}
 
@@ -165,7 +59,7 @@ When a rule body is instantiated using facts from the database, facts are picked
 non-deterministically. While our system uses an implementation dependent order for
 efficiency reasons, sometimes it is important to sort facts by one of the arguments
 because linearity imposes commitment during rule derivation. The abstract syntax for
-this construct is $[\; \m{sop} \Rightarrow y \; | \; BE \;] \lolli HE$, where
+this construct is $\selector$, where
 $\m{sop}$ is the selection operation and $y$ is the variable in the body $BE$ that
 represents the value to be selected according to $\m{sop}$.
 An example using concrete syntax is as follows:
@@ -189,6 +83,39 @@ The following example illustrates the use of the exists construct, where we deri
 do-work(A, W) -o exists B. (perform-work(B, W)).
 \end{Verbatim}
 
+
+\subsection{Comprehensions}
+
+Sometimes we need to consume a linear fact and then immediately generate several facts depending on
+the contents of the database. To solve this particular need, we created the concept of comprehensions, which are
+sub-rules that are applied with all possible combinations of facts from the database. In a comprehension $\comprehension$, $\widehat{x}$ is a list of variables, $BE$ is the body of the comprehension and $HE$ is the head.
+The body $BE$ is used to generate all possible combinations for the head $HE$, according to the facts
+in the database.  We have already seen an example of comprehensions in the visit program (Fig.~\ref{code:visit} line 8).
+Here, we match \texttt{!edge(A, B)} using all the combinations available in the database and for each combination we derive \texttt{visit(B)}.
+
+\subsection{Aggregates}
+
+Another useful feature in logic programs is the ability to reduce several facts into a single fact.
+In LM we have aggregates ($AE$), a special kind of sub-rule that work very similarly to comprehensions.
+In the abstract syntax $\aggregate$, $\m{aop}$ is the aggregate operation, $\widehat{x}$ is the list of variables
+introduced in $BE$, $HE_1$ and $HE_2$ and $y$ is the variable in the body
+$BE$ that represents the values to be aggregated using $\m{aop}$. Like for comprehensions,
+we use $\widehat{x}$ to try all the combinations of $BE$, but, in addition to deriving $HE_1$ for each combination,
+we aggregate the values represented by $y$ and derive $HE_2$ only once using $y$.
+
+To understand aggregates, let's consider a database with the following facts and a rule:
+
+\begin{Verbatim}
+price(@1, 3). price(@1, 4). price(@1, 5).
+count-prices(@1).
+count-prices(A) -o [:sum => P | . | price(A, P) | . | total(A, P)].
+\end{Verbatim}
+
+By applying the rule, we consume \texttt{count-prices(@1)} and
+derive the aggregate which consumes all the \texttt{price(@1, P)} facts.
+These are added and \texttt{total(@1,~12)} is derived since \texttt{P~=~12}.
+LM provides several aggregate operations, including the minimum, maximum, sum, and count.
+
 \subsection{Operational Semantics}
 
 The first argument of every predicate must be typed as a \emph{node}.
@@ -207,6 +134,6 @@ Rules at the beginning of the file have higher priority. At the node level, we c
 the new facts that have been not consider before to create a set of \emph{candidate rules}.
 The set of candidate rules is then applied (by priority) and updated as new facts are derived or consumed.
 
-We have experience in implementing LM in multicores, where we simply partition the graph into many subgraphs, one per thread, and then
-use node stealing when threads start to starve. Our experimental results show that LM programs running on multicores
-have good scalability.
+%We have experience in implementing LM in multicores, where we simply partition the graph into many subgraphs, one per thread, and then
+%use node stealing when threads start to starve. Our experimental results show that LM programs running on multicores
+%have good scalability.

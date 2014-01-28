@@ -7,7 +7,7 @@ to fit in the LM paradigm.
 \subsection{Bipartiteness Checking}
 
 The problem of checking if a graph is bipartite can be seen as a 2-color graph coloring problem.
-The code for this algorithm is shown in Fig.~\ref{code:bichecking}. All nodes in the graph
+The code for this algorithm is shown in Appendix~\ref{code:bichecking}. All nodes in the graph
 start as \texttt{unchecked}, because they do not have a color yet. The axiom \texttt{visit(@1, 1)} is
 instantiated at node \texttt{@1} (line 9) in order to color this node with color 1.
 
@@ -24,7 +24,7 @@ with a different color (line 15) or if it has already failed (line 16).
 The N queens~\cite{8queens} puzzle is the problem of placing N chess queens on an NxN chessboard so
 that no pair of two queens attack each other. The specific challenge of finding all the distinct
 solutions to this problem is a good benchmark in designing parallel algorithms. The LM solution is presented
-in Fig.~\ref{code:nqueens}.
+in Appendix~\ref{code:nqueens}.
 
 First, we consider each cell of the chessboard as a node
 that can communicate with the adjacent left (\texttt{left}), right (\texttt{right}) and left (\texttt{down-left}) and right (\texttt{down-right}) bottom cells.
@@ -42,7 +42,8 @@ all states will be computed since we have facts for each valid state
 at that point. When a cell cannot place a queen, that state is deleted (lines 31, 42 and 54).
 When the program ends, the states will be placed in the bottom row (lines 59-61).
 
-We find our solution very elegant, since it can be easily distributed or executed in parallel. To the best of our knowledge it is also an unusual approach to this problem.
+We find our solution very elegant, since it can be easily distributed or executed in parallel.
+To the best of our knowledge it is also an unusual approach to this problem.
 
 \subsection{Quick-Sort}
 
@@ -57,7 +58,7 @@ the initial list is located. Then we split the list as usual and create two node
 that will recursively sort the sublists. Interestingly, this will create a tree
 that will look similar to a call tree in a functional language.
 
-Fig.~\ref{code:quicksort} presents the code for the quick-sort algorithm in LM.
+Appendix~\ref{code:quicksort} presents the code for the quick-sort algorithm in LM.
 For each sublist to sort, we start with a \texttt{down} fact that must be (eventually)
 transformed into an \texttt{up} fact, where the sublist in the \texttt{up} fact is sorted.
 In line 11 we start with the initial list at node \texttt{@0}. Lines 13-16 will immediately
