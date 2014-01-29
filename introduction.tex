@@ -16,6 +16,18 @@ of imperative programming languages and thus require knowledge of both the libra
 the learning curve steep for unexperienced users. In turn, reasoning about the programs requires knowing how
 the library schedules execution and the operational semantics of the underlying language.
 
+The Dryad system~\cite{Isard:2007:DDD:1272996.1273005} is a framework that combines computational vertices
+with communication channels (edges) to form a data-flow graph. Each program is scheduled to
+run on multiple computers or cores and data is partitioned during runtime. Routines that run on computational vertices
+are sequential, with no locking required.
+The Pregel system~\cite{Malewicz:2010:PSL:1807167.1807184} is also graph based, although programs have a more strict
+structure. They must be represented as a sequence of iterations where each iteration is composed of computation and message passing.
+Pregel is specially suited to solve very big graphs
+and to scale to large architectures.
+
+Another example is the GraphLab~\cite{GraphLab2010} C++ library for developing parallel machine learning algorithms. While
+Pregel uses message passing, GraphLab allows nodes to have read/write access to different scopes through different concurrent access models in order to balance performance and data consistency. While some programs only need to access the local node's data, others may need to update edge information. Each consistency model will provide different guarantees that are better adapted to some algorithms. GraphLab also provides different schedulers that dictate the order in which node's are computed.
+
 Logic programming is a promising approach to implement graph based algorithms since it is a declarative paradigm
 and is less prone to the problems found in imperative programming languages.
 The P2 system~\cite{Loo-condie-garofalakis-p2}, for example, used Datalog to map nodes of a computer network
@@ -53,5 +65,5 @@ To realize LM, we have implemented a compiler and a virtual machine from scratch
 using OpenMPI as a communication layer. Our experimental results show that LM has good scalability.
 Several interesting programs were implemented such as belief propagation~\cite{Gonzalez+al:aistats09paraml},
 belief propagation with residual splash~\cite{Gonzalez+al:aistats09paraml}, PageRank, graph coloring,
-N queens, shortest path~\cite{Dijkstra}, diameter estimation, map reduce, game of life, quick-sort, neural network training, among others.
+N queens, shortest path, diameter estimation, map reduce, game of life, quick-sort, neural network training, among others.
 While these results are evidence that LM is a promising language, this paper will only focus on the more formal aspects of our work.

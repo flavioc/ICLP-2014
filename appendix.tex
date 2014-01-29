@@ -25,6 +25,30 @@ visit(A, P), fail(A) -o fail(A).
 \end{figure}
 \normalsize
 
+\subsection{Shortest Distance program}\label{code:shortest_path}
+
+\begin{figure}[h!]
+\footnotesize\begin{Verbatim}[numbers=left]
+type edge(node, node, int).
+type linear path(node, int, int).
+
+const used = 1.
+const notused = 0.
+
+path(startnode, 0, notused).
+
+path(A, B, used), path(A, B, notused)
+   -o path(A, B, used).
+
+path(A, B1, X), path(A, B2, Y), B1 <= B2
+   -o path(A, B1, X).
+
+path(A, D, notused), A <> finalnode
+   -o {B, W | !edge(A, B, W) | path(B, D + W, notused)}, path(A, D, used).
+\end{Verbatim}
+\end{figure}
+\normalsize
+
 \clearpage
 \subsection{N-Queens program}\label{code:nqueens}
 

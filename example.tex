@@ -9,6 +9,22 @@ The database of facts can be seen as a graph data structure where each node or v
 fraction of the database.  Since derivation rules can only manipulate facts belonging to
 a node, we are able to perform independent rule derivations.
 
+Each fact is an association between a \emph{predicate} and a tuple of values. A predicate is a pair with a name and a tuple of types (the argument types).
+LM rules are type-checked using the predicate declarations in the header of the program. LM has a simple type system that includes the following simples types:
+\emph{node}, \emph{int}, \emph{float}, \emph{string}, \emph{bool}. Recursive types such as \emph{list X} and \emph{pair X; Y} are
+also allowed.
+
+The first argument of every predicate must be typed as a \emph{node}.
+For concurrency and data partitioning purposes, derivation rules are constrained by the expressions that can be written in the body.
+The body of every rule can only refer to facts in the same node.
+However, the expressions in the head may refer to other nodes, as long as those nodes are instantiated in the body of the rule.
+The database of the program can then be partitioned by the first argument of each fact.
+
+Each rule in LM has a defined priority that is inferred from its position in the source file.
+Rules at the beginning of the file have higher priority. At the node level, we consider all
+the new facts that have been not consider before to create a set of \emph{candidate rules}.
+The set of candidate rules is then applied (by priority) and updated as new facts are derived or consumed.
+
 Our first program example is shown in Fig.~\ref{code:message}. This is a message routing program
 that simulates message transmission through a network of nodes.
 We first declare all the predicates (lines 1-2), which represent the kinds of facts we are going to
@@ -46,6 +62,16 @@ A new \texttt{message(B,~Content,~L)} fact is derived at node \texttt{B}.
 When the route list is empty, the message has reached its destination and thus it is consumed
 (rule in lines 8-9). Note that \texttt{1} in the head of the rule means that nothing is derived.
 
+Figure~\ref{code:visit} presents another complete LM program that, for a given graph
+of nodes, performs a visit to all nodes reachable from node $@1$.
+The first rule of the program (lines 6-7) is fired when a node has a \texttt{visit} and a \texttt{unvisited} fact.
+When fired, we first derive \texttt{visited} to mark node as \textit{visited} and use a
+\emph{comprehension} to go through all the edge facts and derive \texttt{visit} for each
+one (comprehensions are explained next in detail). This forces those nodes to be visited also.
+The second rule (line 9) is fired when the
+node is already visited more than once: we keep the \texttt{visited} fact and delete \texttt{visit}.
+Node $@1$ starts with the \texttt{visit(@1)} fact (line 13).
+
 \begin{figure}[h!]
 \small\begin{Verbatim}[numbers=left]
 type edge(node, node).
@@ -53,32 +79,19 @@ type linear visit(node).
 type linear unvisited(node).
 type linear visited(node).
 
-// the program rules
 visit(A), unvisited(A) -o
    visited(A), {B | !edge(A, B) | visit(B)}.
 
 visit(A), visited(A) -o visited(A).
 
-// axioms: the input data
 !edge(@1, @2). !edge(@2, @3). !edge(@1, @4). !edge(@2, @4).
 unvisited(@1). unvisited(@2). unvisited(@3). unvisited(@4).
-
 visit(@1).
 \end{Verbatim}
   \caption{Visit program.}
   \label{code:visit}
 \end{figure}
 \normalsize
-
-Figure~\ref{code:visit} presents another complete LM program that, for a given graph
-of nodes, performs a visit to all nodes reachable from node $@1$.
-The first rule of the program (lines 7-8) is fired when a node has a \texttt{visit} and a \texttt{unvisited} fact.
-When fired, we first derive \texttt{visited} to mark node as \textit{visited} and use a
-\emph{comprehension} to go through all the edge facts and derive \texttt{visit} for each
-one (comprehensions are explained next in detail). This forces those nodes to be visited also.
-The second rule (line 10) is fired when the
-node is already visited more than once: we keep the \texttt{visited} fact and delete \texttt{visit}.
-Node $@1$ starts with the \texttt{visit(@1)} fact (line 16).
 
 If the graph is connected, it is easy to prove that every node will derive \texttt{visited},
 regardless of the order in which rules are applied.

@@ -19,6 +19,23 @@ our neighbor nodes in order to color them with the other color.
 The coloring can fail if a node is already colored with a color \texttt{P} and needs to be colored
 with a different color (line 15) or if it has already failed (line 16).
 
+\subsection{Shortest Distance}
+
+Finding the shortest distance between two nodes in a graph is another well known graph problem.
+Appendix~\ref{code:shortest_path} presents the LM code for this algorithm. We use an \texttt{edge}
+predicate to represent directed edges between nodes and their corresponding weights. To represent the shortest
+distance to a node \texttt{startnode} we have a \texttt{path(A, B, F)} where \texttt{B} is the distance to \texttt{startnode}
+and \texttt{F} is a flag to indicate if such distance has been propagated to the neighbors. Since the distance from
+the \texttt{startnode} to itself is \texttt{0}, we start with the axiom \texttt{path(startnode, 0, notused)} to kick-start
+the algorithm.
+
+The first rule avoids propagating paths with the same distance and the second rule eliminates paths where the distance
+is already larger than some other distance. Finally, the third rule, marks the path as \texttt{used} and propagates
+the distance to the neighboring nodes by taking into account the edge weights.
+
+With enough time, the program will reach quiescence and the shortest distance between \texttt{startnode} and \texttt{finalnode}
+will be determined.
+
 \subsection{N Queens}
 
 The N queens~\cite{8queens} puzzle is the problem of placing N chess queens on an NxN chessboard so
@@ -26,14 +43,14 @@ that no pair of two queens attack each other. The specific challenge of finding 
 solutions to this problem is a good benchmark in designing parallel algorithms. The LM solution is presented
 in Appendix~\ref{code:nqueens}.
 
-First, we consider each cell of the chessboard as a node
-that can communicate with the adjacent left (\texttt{left}), right (\texttt{right}) and left (\texttt{down-left}) and right (\texttt{down-right}) bottom cells.
-For instance, the node at cell (0, 3) (fourth cell from the top-left cell) will connect
-to cells (0, 2), (0, 4) and also (1, 1) and (1, 5), respectively.
-The states are represented as a list of integers, where each integer is the column number where
-the queen was placed. For example $[2, 0]$ means that a queen is placed in cell $(0, 0)$ and another in cell $(1, 2)$.
+First, we consider each cell of the chessboard as a node that can communicate with the adjacent left
+(\texttt{left}) and adjacent right (\texttt{right}) cells and also with the first two non-diagonal cells in the next row
+(\texttt{down-left} and \texttt{down-right}). For instance, the node at cell \texttt{(0,~3)} (fourth cell in the first row) will connect
+to cells \texttt{(0,~2)}, \texttt{(0,~4)} and also \texttt{(1,~1)} and \texttt{(1,~5)}, respectively. The states are represented as a list
+of integers, where each integer is the column number where the queen was placed. For example \texttt{[2, 0]}
+means that a queen is placed in cell \texttt{(0,~0)} and another in cell \texttt{(1,~2)}.
 
-An empty state is instantiated in the top-left node (0, 0) and is then propagated to all nodes in the same row (lines 20-22).
+An empty state is instantiated in the top-left node \texttt{(0,~0)} and is then propagated to all nodes in the same row (lines 20-22).
 Every node will then check if a queen can be placed on their cell. If true, each node will send the new
 state to the row below (line 63-65).
 Recursively, when a node receives a new state, it will (i) send the state to the left

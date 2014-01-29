@@ -1,0 +1,16 @@
+Due to the restrictions placed on LM rules and the partitioning of facts across nodes of the graph, each node can
+execute rules independently. Node computation happens non-deterministically since any node can be picked to run as long as it
+contains enough facts to fire a derivation rule. This means that the programmer cannot expect that facts coming from other nodes will
+be considered as a whole or partially since the process is non-deterministic. Incoming facts are taken into account immediately before the node
+resumes computation.
+
+LM programs can then be made concurrent by simply processing many nodes concurrently. In practice this can be done in many ways.
+Given P processing units and N nodes, we place the N nodes in a work queue and then each processing unit performs work by taking
+one node from the queue and then placing it back at the end of the queue. This trivial technique works but there is no consideration
+for node connections and data locality. An improved technique is to partition the graph of N nodes into P subgraphs and then each
+processing unit will only perform work on its subgraph.
+
+In our implementation for multicores we also partition the graph among P threads but we also use node stealing when threads start to starve
+in order to improve load balancing.
+Our results show that LM programs running on multicores have good scalability. The implementation of the compiler and virtual machine and
+the analysis of experimental results will be presented in a future paper.

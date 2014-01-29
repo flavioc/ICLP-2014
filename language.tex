@@ -5,13 +5,11 @@
 
 Table~\ref{tbl:ast} shows the abstract syntax for rules in LM.
 A LM program $Prog$ consists of a set of derivation rules $\Sigma$ and a database $D$.
-Each derivation rule $R$ can be written as $BE \lolli HE$ where $BE$ is the body of the rule and
+A derivation rule $R$ may be written as $BE \lolli HE$ where $BE$ is the body of the rule and
 $HE$ is the head. We can also use rule wide variables using $\; \forall_{x}. R$, so that we can instantiate
 shared variables in the body and the head.
-In order to control how facts are selected in the body, we can use \emph{selectors} of
+If we want to control how facts are selected in the body, we may use \emph{selectors} of
 the form $\selector$ (explained later).
-%Rules without bodies are allowed in LM and they are called \textit{axioms} (lines 13-16 in Fig.~\ref{code:visit}).
-%Rules without heads are also allowed.
 
 \begin{table}[h]
 \centering
@@ -44,14 +42,10 @@ Alternatively we can use an empty body by using $1$, which creates an axiom.
 Fact expressions are template facts that instantiate variables
 (from facts in the database) such as \texttt{visit(A)} in line 10 in Fig.~\ref{code:visit}.
 Constraints are boolean expressions that must
-be true in order for the rule to be fired (example \texttt{C~=~A~+~B}). Constraints use variables from fact expressions and are built using a small functional language that includes mathematical operations, boolean operations, external functions and literal values.
+be true in order for the rule to be fired (example: \texttt{C~=~A~+~B}). Constraints use variables from fact expressions and are built using a small functional language that includes mathematical operations, boolean operations, external functions and literal values.
 
 The head of a rule ($HE$) contains linear ($L$) and persistent ($P$) \emph{fact templates} which are uninstantiated facts and will derive new facts. The head can also have \emph{exist constructs} ($EE$), \emph{comprehensions} ($CE$) and \emph{aggregates} ($AE$). All those constructs
 may use all the variables instantiated in the body. We can also use an empty head by choosing $1$.
-
-Each fact is an association between a \emph{predicate} and a tuple of values. A predicate is a pair with a name and a tuple of types (the argument types). LM rules are type-checked using the predicate declarations in the header of the program. LM has a simple type system that includes the following simples types: \emph{node}, \emph{int}, \emph{float}, \emph{string}, \emph{bool}. Recursive types such as \emph{list X} and \emph{pair X; Y} are
-also allowed.
-
 
 \subsection{Selectors}
 
@@ -68,13 +62,13 @@ An example using concrete syntax is as follows:
 [:min => W | !edge(A, B), weight(A, B, W)] -o picked(A, B, W).
 \end{Verbatim}
 
-In this case, we order the \texttt{weight} facts by $W$ in ascending order and then try
-to match them. Other operations available are $max$ and $random$ (to force no pre-defined order at the
+In this case, we order the \texttt{weight} facts by \texttt{W} in ascending order and then try
+to match them. Other operations available are \texttt{:max} and \texttt{:random} (to force no pre-defined order at the
 implementation level).
 
 \subsection{Exists Constructs}
 
-Exist constructs ($EE$) are based on the linear logic construct of the same name and are used to create new node addresses.
+Exists constructs ($EE$) are based on the linear logic construct of the same name and are used to create new node addresses.
 We can use the new address to instantiate new facts for this node.  
 The following example illustrates the use of the exists construct, where we derive
 \texttt{perform-work} at a new node \texttt{B}.
@@ -108,32 +102,10 @@ To understand aggregates, let's consider a database with the following facts and
 \begin{Verbatim}
 price(@1, 3). price(@1, 4). price(@1, 5).
 count-prices(@1).
-count-prices(A) -o [:sum => P | . | price(A, P) | . | total(A, P)].
+count-prices(A) -o [:sum => P | . | price(A, P) | 1 | total(A, P)].
 \end{Verbatim}
 
 By applying the rule, we consume \texttt{count-prices(@1)} and
 derive the aggregate which consumes all the \texttt{price(@1, P)} facts.
 These are added and \texttt{total(@1,~12)} is derived since \texttt{P~=~12}.
 LM provides several aggregate operations, including the minimum, maximum, sum, and count.
-
-\subsection{Operational Semantics}
-
-The first argument of every predicate must be typed as a \emph{node}.
-For distribution and data partitioning purposes, derivation rules are constrained by the expressions that can be written in the body.
-The body of every rule can only refer to facts in the same node.
-However, the expressions in the head may refer to other nodes, as long as those nodes are instantiated in the body of the rule.
-The database of the program can then be partitioned by the first argument of each fact.
-
-The execution is performed at the node level and can happen non-deterministically (i.e., any node can
-be picked to run). This means that the programmer cannot expect
-that facts coming from other nodes will be considered as a whole or partially since the process is non-deterministic.
-Under these restrictions, computation can then be parallelized by processing many nodes concurrently.
-
-Each rule in LM has a defined priority that is inferred from its position in the source file.
-Rules at the beginning of the file have higher priority. At the node level, we consider all
-the new facts that have been not consider before to create a set of \emph{candidate rules}.
-The set of candidate rules is then applied (by priority) and updated as new facts are derived or consumed.
-
-%We have experience in implementing LM in multicores, where we simply partition the graph into many subgraphs, one per thread, and then
-%use node stealing when threads start to starve. Our experimental results show that LM programs running on multicores
-%have good scalability.
