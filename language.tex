@@ -35,14 +35,14 @@ the form $\selector$ (explained later).
 \caption{Abstract syntax of LM.}\label{tbl:ast}
 \end{table}
 
-The body of the rule $BE$ contains linear ($L$) and persistent ($P$) \emph{fact expressions} and
+The body of the rule $BE$ may contain linear ($L$) and persistent ($P$) \emph{fact expressions} and
 constraints ($C$). We can chain those elements by using $BE, BE$ or introduce body variables using $\exists_{x}. BE$.
 Alternatively we can use an empty body by using $1$, which creates an axiom.
 
 Fact expressions are template facts that instantiate variables
 (from facts in the database) such as \texttt{visit(A)} in line 10 in Fig.~\ref{code:visit}.
 Constraints are boolean expressions that must
-be true in order for the rule to be fired (example: \texttt{C~=~A~+~B}). Constraints use variables from fact expressions and are built using a small functional language that includes mathematical operations, boolean operations, external functions and literal values.
+be true in order for the rule to be fired (for example, \texttt{C~=~A~+~B}). Constraints use variables from fact expressions and are built using a small functional language that includes mathematical operations, boolean operations, external functions and literal values.
 
 The head of a rule ($HE$) contains linear ($L$) and persistent ($P$) \emph{fact templates} which are uninstantiated facts and will derive new facts. The head can also have \emph{exist constructs} ($EE$), \emph{comprehensions} ($CE$) and \emph{aggregates} ($AE$). All those constructs
 may use all the variables instantiated in the body. We can also use an empty head by choosing $1$.

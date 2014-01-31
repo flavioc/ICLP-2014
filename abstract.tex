@@ -1,13 +1,21 @@
-Due to the popularity of social networks on the internet, there has been an increased interested
-in executing graph based algorithms concurrently. Systems such as Pregel
-or GraphLab are specialized frameworks for programming and executing algorithms
-over graph structures. Although these frameworks make it significantly easier to write those kinds
-of programs, they tend to have a steep learning curve because they use low level languages such as
-C++. We have designed a logic programming language for programming graph based algorithms in a declarative
-fashion. Logic based languages raise the programming abstractions because they use logical clauses to drive computation, which makes
-them be both easier to write and to reason about. Since our language is based on linear logic, a
-powerful logical system where logical facts can be consumed, our programs tend to be more expressive
-than in other logic programming languages. Programs are mapped to an underlying graph structure where
-sequential computation is performed at the node level and communication takes place when nodes send
-facts to each other. We have implemented several search algorithms and machine learning algorithms
-and have seen good scalability results on multicore machines.
+Due to the popularity of social networks on the internet, there has
+been an increased interested in executing graph based algorithms
+concurrently. Systems such as Pregel or GraphLab are specialized
+frameworks for programming and executing algorithms over graph
+structures. Although these frameworks make it significantly easier to
+write those kinds of programs, they tend to have a steep learning
+curve because they use low level languages such as C++. We have
+designed a new logic programming language called LM (Linear Meld) for
+programming graph based algorithms in a declarative fashion. Logic
+based languages raise the programming abstractions because they use
+logical clauses to drive computation, which makes them be both easier
+to write and to reason about. Since our language is based on linear
+logic, a powerful logical system where logical facts can be consumed,
+our programs tend to be more expressive than in other logic
+programming languages. Programs are mapped to an underlying graph
+structure where computation is performed at the node level and
+communication takes place when nodes send facts to each other.  LM
+programs are thus naturally concurrent because facts are partitioned
+by nodes of a graph data structure. In this paper we want to
+present the syntax and semantics of our language, explain how programs
+can be written and what novel ideas LM brings to the table.
