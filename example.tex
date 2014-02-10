@@ -23,7 +23,7 @@ The database of the program can then be partitioned by the first argument of eac
 Each rule in LM has a defined priority that is inferred from its position in the source file.
 Rules at the beginning of the file have higher priority. At the node level, we consider all
 the new facts that have been not consider before to create a set of \emph{candidate rules}.
-The set of candidate rules is then applied (by priority) and updated as new facts are derived or consumed.
+The set of candidate rules is then applied (by priority) and updated as new facts are derived.
 
 Our first program example is shown in Fig.~\ref{code:message}. This is a message routing program
 that simulates message transmission through a network of nodes.
@@ -33,7 +33,7 @@ the graph data structure. Predicate \texttt{edge/2} is a non \texttt{linear} (pe
 The second argument of \texttt{message/2} is the message content represented as a \texttt{string}
 while the third argument is the route list.
 
-The program rules are declared in lines 4-9, while the program's axioms are written in lines 11-12.
+The program rules are declared in lines 4-8, while the program's axioms are written in lines 10-11.
 When persistent facts are used in rules (line 5) they must be
 preceded by \texttt{!}. This helps the programmer in distinguishing between persistent facts and linear facts.
 
@@ -46,8 +46,7 @@ message(A, Content, [B | L]),
 !edge(A, B)
    -o message(B, Content, L).
 
-message(A, Content, [])
-   -o 1.
+message(A, Content, []) -o 1.
 
 !edge(@1, @2). !edge(@2, @3). !edge(@3, @4). !edge(@1, @3).
 message(@1, 'Hello World', [@3, @4]).

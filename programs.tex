@@ -1,9 +1,9 @@
 
-We now present several LM programs in order to show that they tend to
-be concise and easy to write\footnote{More examples of LM programs are available at \url{http://github.com/flavioc/meld}.}. We also want to make clear how the
-language facilities can be used to solve algorithms that at the first
-glance does not seem to fit in the LM paradigm.
+We now present some LM programs in order to show that they tend to
+be concise and easy to write\footnote{More examples of LM programs are available at \url{http://github.com/flavioc/meld}.}. We want to make clear how the
+language facilities can be used to solve interesting graph-based algorithms.
 
+\begin{comment}
 \subsection{Bipartiteness Checking}
 
 The problem of checking if a graph is bipartite can be seen as a 2-color graph coloring problem.
@@ -18,6 +18,7 @@ our neighbor nodes in order to color them with the other color.
 
 The coloring can fail if a node is already colored with a color \texttt{P} and needs to be colored
 with a different color (line 15) or if it has already failed (line 16).
+\end{comment}
 
 \subsection{Shortest Distance}
 
@@ -36,6 +37,19 @@ the distance to the neighboring nodes by taking into account the edge weights.
 With enough time, the program will reach quiescence and the shortest distance between \texttt{startnode} and \texttt{finalnode}
 will be determined.
 
+\subsection{PageRank}
+
+PageRank is a well known graph algorithm that is used to compute the relative relevance of web pages.
+The code for a synchronous version of the algorithm is shown in Appendix~\ref{code:pagerank}.
+As the name indicates, the pagerank is computed for a certain number of iterations. Initially, the initial pagerank is the same for every page and is
+initialized in the first rule (lines 15-18) along with an accumulator.
+
+The second rule of the program (lines 21-25) propagates a newly computed pagerank value to all neighbors. Consequently, each node will accumulate
+the pagerank values that are sent to them through the fourth rule (lines 35-37) and it will immediately add all the other available incoming values
+through the use of the aggregate. When we have accumulated all the values we need, the third rule (lines 28-32) is fired and a new pagerank value is derived.
+
+We also have an asynchronous version of the algorithm that trades correctness with convergence speed since it does synchronize between iterations.
+
 \subsection{N Queens}
 
 The N queens~\cite{8queens} puzzle is the problem of placing N chess queens on an NxN chessboard so
@@ -50,11 +64,10 @@ to cells \texttt{(0,~2)}, \texttt{(0,~4)} and also \texttt{(1,~1)} and \texttt{(
 of integers, where each integer is the column number where the queen was placed. For example \texttt{[2, 0]}
 means that a queen is placed in cell \texttt{(0,~0)} and another in cell \texttt{(1,~2)}.
 
-An empty state is instantiated in the top-left node \texttt{(0,~0)} and is then propagated to all nodes in the same row (lines 20-22).
-Every node will then check if a queen can be placed on their cell. If true, each node will send the new
-state to the row below (line 63-65).
+An empty state is instantiated in the top-left node \texttt{(0,~0)} and then propagated to all nodes in the same row (lines 20-22).
+Each node then tries to place a queen on their cell and then send a new state to the row below (lines 63-65).
 Recursively, when a node receives a new state, it will (i) send the state to the left
-or to the right and (ii) try to place the queen in its cell (by using \texttt{test-y}, \texttt{test-diag-left} and \texttt{test-diag-right}). With this method,
+or to the right and (ii) try to place the queen in its cell (using \texttt{test-y}, \texttt{test-diag-left} and \texttt{test-diag-right}). With this method,
 all states will be computed since we have facts for each valid state
 at that point. When a cell cannot place a queen, that state is deleted (lines 31, 42 and 54).
 When the program ends, the states will be placed in the bottom row (lines 59-61).
@@ -62,6 +75,7 @@ When the program ends, the states will be placed in the bottom row (lines 59-61)
 We find our solution very elegant, since it can be easily distributed or executed in parallel.
 To the best of our knowledge it is also an unusual approach to this problem.
 
+\begin{comment}
 \subsection{Quick-Sort}
 
 The quick-sort algorithm is a divide and conquer sorting algorithm that works by splitting
@@ -91,3 +105,4 @@ When the sublists are finally sorted, we get two \texttt{sorted} facts that will
 against \texttt{waitpivot} in the rule located in lines 28-31. The sorted sublists
 are appended and then an \texttt{up} fact is finally derived (line 37).
 
+\end{comment}

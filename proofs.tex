@@ -1,3 +1,4 @@
+
 \newcommand{\mz}{\m{match} \;}
 \newcommand{\tab}[0]{\;\;\;\;}
 \newcommand{\dz}{\m{derive} \;}
@@ -78,11 +79,11 @@ The aggregate is initiated as $\compr{C} \; 0$.
 
 \subsection{Dynamic Semantics}
 
-The high level dynamic semantics (HLD) formalize the mechanism of matching rules and deriving new facts and is closely related to the fragment of linear logic we presented before.
+The high level dynamic semantics (HLD) formalize the mechanism of matching rules and deriving new facts and is closely related to the fragment presented above.
 From the sequent calculus, we consider $\Gamma$ and $\Delta$ the database of persistent and linear facts, respectively.
-We assume that the rules of the program are persistent linear implications of the form $\bang (A \lolli B)$ that we put in a separate context $\Phi$.
-We ignore the right hand side $C$ of the calculus and use inversion on the $\Delta$ and $\Gamma$ context so that we only have atomic terms (facts). To apply rules
-we use chaining by focusing on one of the derivation rules in $\Phi$.
+We consider the rules of the program as persistent linear implications of the form $\bang (A \lolli B)$ that we put in a separate context $\Phi$.
+We ignore the right hand side $C$ of the calculus and use inversion on the $\Delta$ and $\Gamma$ contexts so that we only have atomic terms (facts). To apply rules
+we use chaining by focusing on the derivation rules of $\Phi$.
 
 The HLD semantics are shown in \ref{hlsemantics} and are composed of four main judgments: (i) $\m{run}$ picks some rule and tries to apply it;
 (ii) $\m{apply}$ picks a subset of linear facts from $\Delta$ and tries to match the body of the rule and then derives the head; (iii) $\m{match}$
@@ -90,12 +91,12 @@ verifies that a set of linear facts matches the body; and (iv) $\m{derive}$ inst
 (the contexts for new persistent and linear facts).
 
 We note that the HLD semantics do not take distribution into account, since we assume that the database is global. We also do not model variable bindings
-since it complicates the formal system. The low level dynamic semantics (LLD) shown in \ref{low_level_semantics} will improve upon HLD by adding rule priorities, by removing the non-determinism
+since it complicates the formal system. The low level dynamic semantics (LLD) shown in \ref{low_level_semantics} improve upon HLD by adding rule priorities, by removing the non-determinism
 when matching the body of rules by modeling all the steps and by applying comprehensions or aggregates as many times as the database allows.
-LLD is very closely related to our virtual machine, thus it is a good starting point to understand our implementation.
+LLD is closely related to our virtual machine, thus it is a good starting point to understand our implementation.
 
-In the LLD, we try all the rules in order. For each rule, we use a \emph{continuation stack} to store the \emph{continuation frames} created by each fact $p$ present
-in the body of the rule. Each frame considers all the facts relevant to the fact template given the current variable bindings ($\mo$rules), that may or not fail during the
+In LLD we try all the rules in order. For each rule, we use a \emph{continuation stack} to store the \emph{continuation frames} created by each fact template $p$ present
+in the body of the rule. Each frame considers all the facts relevant to the template given the current variable bindings ($\mo$rules), that may or not fail during the
 remaining matching process. It contains enough state to resume the matching process at the time of its creation, including which facts of the predicate $p$
 we can still try.
 
@@ -139,8 +140,7 @@ Given a match $\mo \Gamma; \Delta_1, \Delta_2; \cdot; A; B; \cdot; R \rightarrow
    \item $\mz \Delta_2 \rightarrow A$ and $\mo \Gamma; \Delta_1; \Delta_2; \cdot; B; C'; R \rightarrow \Xi'; \Delta'; \Gamma'$ (related)
 \end{enumerate}
 \end{lemma}
-\begin{proof}
-Use the body match soundness theorem.
+\begin{proof}Use the body match soundness theorem.
 \end{proof}
 
 When we say that a match is related to a term $A$ and a database $\Delta_1, \Delta_2, \Gamma$ we mean that

@@ -26,17 +26,19 @@ Pregel is specially suited to solve very big graphs
 and to scale to large architectures. GraphLab~\cite{GraphLab2010} is a C++ library for developing parallel machine learning algorithms. While
 Pregel uses message passing, GraphLab allows nodes to have read/write access to different scopes through different concurrent access models in order to balance performance and data consistency. While some programs only need to access the local node's data, others may need to update edge information. Each consistency model will provide different guarantees that are better adapted to some algorithms. GraphLab also provides different schedulers that dictate the order in which node's are computed.
 
-An alternative promising approach to implement graph based algorithms 
+An alternative promising approach for graph based algorithms 
 is logic programming. For example, the P2 system~\cite{Loo-condie-garofalakis-p2}, used Datalog to map nodes of a computer network
 to a graph, where each node would do computation locally and could communicate with neighbor nodes.
 This kind of programming is more amenable to proof since a program is just a set of logical clauses.
 Another good example is the Meld language, created by
 Ashley-Rollman et al.~\cite{ashley-rollman-derosa-iros07wksp,ashley-rollman-iclp09}, which was designed to
 program massively distributed systems made of modular robots with a dynamic topology. Meld was itself inspired
-in the P2 system because it used the same graph based model of computation but adapted to the concept of a moving
-robot.
+in the P2 system because it is based on the graph model of computation but adapted to the concept of moving
+robots.
 
-In this paper, we present a new logic programming language called LM (Linear Meld) for concurrent programming over graph structures designed to take advantage of the recent architectures such as multicores or clusters of multicores. LM is based on the Meld language, but differs from other logic programming languages such as Datalog or Prolog for three main reasons. First, it integrates both classical
+In this paper, we present a new logic programming language called LM (Linear Meld) for concurrent programming over graph structures designed to take advantage
+of the recent architectures such as multicores or clusters of multicores. LM is based on the Meld language, but differs from other logic programming languages
+such as Datalog or Prolog for three main reasons. First, it integrates both classical
 logic and linear logic into the language, allowing some facts to be retracted and asserted in a logical fashion. Second, unlike
 Prolog, LM is a bottom up logic programming language (similar to Datalog) since the database is updated incrementally as rules are
 applied. Third, LM is a language created to solve general graph based algorithms, unlike P2 or Meld which aimed to solve domain
@@ -48,7 +50,7 @@ and what novel ideas LM brings to the table. We identify three key contributions
 \begin{description}
    \item[Linear Logic:] We integrated linear logic into the original Meld language so that program state can be encoded naturally.
    Meld started as a classical logic programming language where everything that is derived is true until the end
-   of the execution. Linear logic turns some logical facts into resources that will be consumed when a rule is applied. In turn, this makes it possible to represent program state in a natural and declarative fashion.
+   of the execution. Linear logic turns logical facts into resources that will be consumed when a rule is applied. In turn, this makes it possible to represent program state in a natural and declarative fashion.
    \item[Concurrency:] LM programs are naturally concurrent because facts are partitioned by vertices of a graph data structure. While the original Meld sees graphs as a network of robots, we see each node as a logical part of the program. This is made possible due to the restrictions on derivation rules, which can only use facts from a single vertex.
    \item[Semantics:] Starting from a fragment of linear logic used in LM, we formalized a high level dynamic semantics that is closely related to this fragment.
    We then designed a low level dynamic semantics that is a blueprint for a low level implementation of LM. It is very

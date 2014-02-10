@@ -1,6 +1,7 @@
 
 \section{Programs}
 
+\begin{comment}
 \subsection{Bipartiteness Checking program}\label{code:bichecking}
 
 \begin{figure}[h!]
@@ -24,6 +25,7 @@ visit(A, P), fail(A) -o fail(A).
 \end{Verbatim}
 \end{figure}
 \normalsize
+\end{comment}
 
 \subsection{Shortest Distance program}\label{code:shortest_path}
 
@@ -48,6 +50,52 @@ path(A, D, notused), A <> finalnode
 \end{Verbatim}
 \end{figure}
 \normalsize
+
+\clearpage
+\subsection{PageRank}\label{code:pagerank}
+
+\begin{figure}[h!]
+   \footnotesize\begin{Verbatim}[numbers=left]
+type output(node, node, float).
+type linear pagerank(node, float, int).
+type numLinks(node, int).
+type numInput(node, int).
+type linear accumulator(node, float, int, int).
+type linear newrank(node, node, float, int).
+type linear start(node).
+
+const damping = 0.85.
+const iterations = str2int(@arg1).
+const pages = @world.
+
+start(A).
+
+start(A),
+!numInput(A, T)
+   -o accumulator(A, 0.0, T, 1),
+      pagerank(A, 1.0 / float(pages), 0).
+
+// distribute rank
+pagerank(A, V, Id),
+!numLinks(A, C),
+Id < iterations,
+Result = V / float(C)
+	-o {B, W | !output(A, B, W) | newrank(B, A, Result, Id + 1)}.
+
+// compute new rank
+accumulator(A, Acc, 0, Id),
+!numInput(A, T),
+V = damping + (1.0 - damping) * Acc,
+Id <= iterations
+	-o pagerank(A, V, Id), accumulator(A, 0.0, T, Id + 1).
+	
+// accumulate rank
+newrank(A, B, V, Id), accumulator(A, Acc, T, Id), T > 0
+   -o [sum => S, count => C | D | newrank(A, D, S, Id) |
+            1 | accumulator(A, Acc + V + S, T - 1 - C, Id)].
+\end{Verbatim}
+\normalsize
+\end{figure}
 
 \clearpage
 \subsection{N-Queens program}\label{code:nqueens}
@@ -123,6 +171,7 @@ send-down(A, Nodes, Coords)
 \end{figure}
 \normalsize
 
+\begin{comment}
 \clearpage
 \subsection{Quick-Sort program}\label{code:quicksort}
 
@@ -171,6 +220,7 @@ up(A, L), back(A, B) -o sorted(B, A, L).
 \end{Verbatim}
 \end{figure}
 \normalsize
+\end{comment}
 
 \clearpage
 \section{Linear Logic fragment used in LM}\label{linear_logic}
@@ -637,7 +687,6 @@ up(A, L), back(A, B) -o sorted(B, A, L).
 
 \subsection{Stack Transformation}
 
-
 \[
 \infer[\strans]
 {\strans \Xi; [\Gamma'; \Delta_N; \cdot; \bang p; \Omega; \cdot; \Upsilon], P; [\Gamma'; \Delta_N - \Xi; \cdot; \bang p, \Omega; \cdot; \Upsilon], P'}
@@ -671,7 +720,6 @@ up(A, L), back(A, B) -o sorted(B, A, L).
 \]
 
 \subsection{Comprehension Derivation}
-
 
 \[
 \infer[\dc p]

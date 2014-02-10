@@ -77,7 +77,6 @@ The following example illustrates the use of the exists construct, where we deri
 do-work(A, W) -o exists B. (perform-work(B, W)).
 \end{Verbatim}
 
-
 \subsection{Comprehensions}
 
 Sometimes we need to consume a linear fact and then immediately generate several facts depending on
@@ -97,7 +96,7 @@ $BE$ that represents the values to be aggregated using $\m{aop}$. Like for compr
 we use $\widehat{x}$ to try all the combinations of $BE$, but, in addition to deriving $HE_1$ for each combination,
 we aggregate the values represented by $y$ and derive $HE_2$ only once using $y$.
 
-To understand aggregates, let's consider a database with the following facts and a rule:
+Let's consider a database with the following facts and a rule:
 
 \begin{Verbatim}
 price(@1, 3). price(@1, 4). price(@1, 5).
