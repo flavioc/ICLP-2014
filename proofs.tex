@@ -140,7 +140,7 @@ Given a match $\mo \Gamma; \Delta_1, \Delta_2; \cdot; A; B; \cdot; R \rightarrow
    \item $\mz \Delta_2 \rightarrow A$ and $\mo \Gamma; \Delta_1; \Delta_2; \cdot; B; C'; R \rightarrow \Xi'; \Delta'; \Gamma'$ (related)
 \end{enumerate}
 \end{lemma}
-\begin{proof}Use the body match soundness theorem.
+\begin{proof}Use the main matching soundness theorem.
 \end{proof}
 
 When we say that a match is related to a term $A$ and a database $\Delta_1, \Delta_2, \Gamma$ we mean that
@@ -152,7 +152,7 @@ The body match lemma tells us that if we start a match of a body $A$ we will eit
 
 This lemma uses a more complicated theorem that is recursively defined through judgments $\m{match}_1$ and $\m{cont}$ that use mutual induction on the
 size of the continuation stack, the size of the remaining terms to match and also the size of alternatives at each continuation frame. We always ensure that the
-continuation stack stays consistent at all times, when backtracking or moving forward.
+continuation stack stays consistent at all times, when backtracking or moving forward. Theorem is presented in Appendix~\ref{main_soundness_theorem}.
  
 The second stepping stone in the soundness proof is the derivation lemma. After we successfully match the
 body of a rule, we need to prove that the derivation process (through judgments $\m{derive}_1$) is also
