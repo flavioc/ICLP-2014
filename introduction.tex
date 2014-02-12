@@ -1,18 +1,8 @@
 
-Developments in parallel and distributed programming have given birth to several programming models.
-At the end of the spectrum are lower-level programming abstractions such as
-\emph{message passing} (e.g., MPI~\cite{gabriel04-open-mpi}) and \emph{shared memory}
-(e.g., Pthreads or OpenMP~\cite{Chapman-2007-UOP-1370966}).
-While such abstractions are very expressive and enable the programmer to write very performant code,
-they tend to be very hard to use and debug due to synchronization problems.
-On the other hand, we have many declarative programming paradigms, such as logic or functional programming,
-that can be run in parallel~\cite{Blelloch:1996:PPA:227234.227246,Gupta:2001:PEP:504083.504085} and tend to be easier to write.
-
 Due to the popularity of social networks and the explosion of the content available in the World Wide Web, there has been
-increased interest in running graph based algorithms concurrently. Since the sheer size of
-the available datasets makes it impossible to run such algorithms in a single machine, most of the available concurrent frameworks developed for these kinds of algorithms are implemented as libraries on top
-of imperative programming languages, which require knowledge of both the library and the interface, making
-the learning curve steep for unexperienced users. In turn, reasoning about the programs requires knowing how
+increased interest in running graph-based algorithms concurrently. Most of the available concurrent frameworks are implemented as libraries on top
+of imperative programming languages, which require knowledge of both the library and the interface, making it difficult to learn and use correctly, for novice and experienced programmers alike.
+Reasoning about the programs requires knowing how
 the library schedules execution and the operational semantics of the underlying language.
 
 Some good examples are the Dryad, Pregel and GraphLab systems.
@@ -20,44 +10,44 @@ The Dryad system~\cite{Isard:2007:DDD:1272996.1273005} is a framework that combi
 with communication channels (edges) to form a data-flow graph. Each program is scheduled to
 run on multiple computers or cores and data is partitioned during runtime. Routines that run on computational vertices
 are sequential, with no locking required.
-The Pregel system~\cite{Malewicz:2010:PSL:1807167.1807184} is also graph based, although programs have a more strict
+The Pregel system~\cite{Malewicz:2010:PSL:1807167.1807184} is also graph-based, although programs have a more strict
 structure. They must be represented as a sequence of iterations where each iteration is composed of computation and message passing.
 Pregel is specially suited to solve very big graphs
 and to scale to large architectures. GraphLab~\cite{GraphLab2010} is a C++ library for developing parallel machine learning algorithms. While
 Pregel uses message passing, GraphLab allows nodes to have read/write access to different scopes through different concurrent access models in order to balance performance and data consistency. While some programs only need to access the local node's data, others may need to update edge information. Each consistency model will provide different guarantees that are better adapted to some algorithms. GraphLab also provides different schedulers that dictate the order in which node's are computed.
 
-An alternative promising approach for graph based algorithms 
-is logic programming. For example, the P2 system~\cite{Loo-condie-garofalakis-p2}, used Datalog to map nodes of a computer network
+An alternative promising approach for graph-based algorithms 
+is logic programming. For instance, the P2 system~\cite{Loo-condie-garofalakis-p2}, used Datalog to map nodes of a computer network
 to a graph, where each node would do computation locally and could communicate with neighbor nodes.
-This kind of programming is more amenable to proof since a program is just a set of logical clauses.
 Another good example is the Meld language, created by
 Ashley-Rollman et al.~\cite{ashley-rollman-derosa-iros07wksp,ashley-rollman-iclp09}, which was designed to
 program massively distributed systems made of modular robots with a dynamic topology. Meld was itself inspired
 in the P2 system because it is based on the graph model of computation but adapted to the concept of moving
 robots.
+Logic-based systems are more amenable to proof since a program is just a set of logical clauses.
 
 In this paper, we present a new logic programming language called LM (Linear Meld) for concurrent programming over graph structures designed to take advantage
 of the recent architectures such as multicores or clusters of multicores. LM is based on the Meld language, but differs from other logic programming languages
-such as Datalog or Prolog for three main reasons. First, it integrates both classical
+such as Datalog or Prolog in three main aspects. First, it integrates both classical
 logic and linear logic into the language, allowing some facts to be retracted and asserted in a logical fashion. Second, unlike
 Prolog, LM is a bottom up logic programming language (similar to Datalog) since the database is updated incrementally as rules are
-applied. Third, LM is a language created to solve general graph based algorithms, unlike P2 or Meld which aimed to solve domain
-specific problems.
+applied. Third, LM is a language created to solve general graph-based algorithms, unlike P2 or Meld which were designed for more specific domains.
 
-In this paper we want to present the syntax and semantics of our language, explain how programs can be written
-and what novel ideas LM brings to the table. We identify three key contributions in our work:
+In the next sections, we present the syntax and semantics of our language and explain how to write programs that take advantage of its expressive power. We identify three key contributions in our work:
 
 \begin{description}
    \item[Linear Logic:] We integrated linear logic into the original Meld language so that program state can be encoded naturally.
    Meld started as a classical logic programming language where everything that is derived is true until the end
    of the execution. Linear logic turns logical facts into resources that will be consumed when a rule is applied. In turn, this makes it possible to represent program state in a natural and declarative fashion.
-   \item[Concurrency:] LM programs are naturally concurrent because facts are partitioned by vertices of a graph data structure. While the original Meld sees graphs as a network of robots, we see each node as a logical part of the program. This is made possible due to the restrictions on derivation rules, which can only use facts from a single vertex.
-   \item[Semantics:] Starting from a fragment of linear logic used in LM, we formalized a high level dynamic semantics that is closely related to this fragment.
-   We then designed a low level dynamic semantics that is a blueprint for a low level implementation of LM. It is very
-   close to our implementation and helped us during development. We also explain how we proved the soundness of our low level semantics.
+   \item[Concurrency:] LM programs are naturally concurrent because facts are partitioned by vertices of a graph data structure. While the original Meld sees graphs as a network of robots, we see each node as a logical part of the program. This is made possible due to the restrictions on derivation rules, which
+only use local facts, residing on a node, or communicate with neighboring nodes.
+   \item[Semantics:] Starting from a fragment of linear logic used in LM, we formalize a high level dynamic semantics that is closely related to this fragment.
+   We then design a low level dynamic semantics and sketch the soundness proof of our low level
+   semantics with respect to the high level language specification. The low level specification
+   provides the basis for an efficient implementation of LM.
 \end{description}
 
-To realize LM, we have implemented a compiler and a virtual machine from scratch that executes LM programs on multicore machines
+To realize LM, we have implemented a compiler and a virtual machine that executes LM programs on multicore machines
 \footnote{Source code is available at \url{http://github.com/flavioc/meld}.}. We also have a preliminary version that runs on networks by
 using OpenMPI as a communication layer. Our experimental results show that LM has good scalability.
 Several interesting programs were implemented such as belief propagation~\cite{Gonzalez+al:aistats09paraml},

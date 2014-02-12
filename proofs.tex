@@ -20,39 +20,16 @@
 \newcommand{\dc}{\m{derive}_c \;}
 \newcommand{\ao}{\m{apply}_1 \;}
 
-In this section, we present the sequent calculus of a fragment of intuitionistic linear logic~\cite{Girard95logic:its} used by LM and also the dynamic semantics of LM. For the latter, we formalized both an higher level dynamic semantics based on the linear logic fragment and a more concrete low level dynamic semantics that resembles the virtual machine implementation. We also prove that the low level dynamic semantics are sound in respect to the high level semantics. 
+We now present the sequent calculus of a fragment of intuitionistic linear
+logic~\cite{Girard95logic:its} used by LM followed by the dynamic semantics built on top of
+this fragment.
 
-\subsection{Intuitionistic Linear Logic}
-
-The fragment of linear logic used by LM is presented in Appendix~\ref{linear_logic}.
+The fragment of linear logic used by LM is presented in \ref{linear_logic}.
 We use a standard set of connectives except the $\m{def} \; A$ connective, which is used to logically justify comprehensions and aggregates.
-The sequent calculus has the form $\Psi; \Gamma; \Delta \rightarrow C$, where $\Psi$ is the typed term context used in the quantifiers, $\Gamma$ is the multi-set
-of persistent terms, $\Delta$ is the multi-set of linear terms and $C$ is the term we want to prove.
+The sequent calculus has the form $\Psi; \Gamma; \Delta \rightarrow C$, where $\Psi$ is the typed term context used in the quantifiers, $\Gamma$ is the set
+of persistent terms, $\Delta$ is the multi-set of linear propositions and $C$ is the proposition we want to prove.
 Table~\ref{table:linear} relates the linear logic directives with the LM syntax.
 
-For definitions, we took inspiration from Baelde's work on least and greatest fixed points in linear logic~\cite{Baelde:2012:LGF:2071368.2071370}. Baelde's system goes beyond
-simple recursive definitions and allows proofs using induction and co-induction in linear logic. Fortunately, the proof system satisfies cut-elimination which
-makes it consistent.
-
-In a comprehension, we want to apply an implication as many matches as the database allows. One way to formally describe comprehensions would be to use persistent
-rules that would be used a few times and then would be forgotten. A more reasonable approach is to use
-definitions. Given a comprehension $C = \{ \; \widehat{x}; \; A; \; B \; \}$ with a body $A$ and a head $B$, then we can build the following recursive definition:
-
-\[
-\compr{C} \defeq 1 \with ((A \lolli B) \otimes \compr{C})
-\]
-
-We can unfold $\compr{C}$ to either stop (by selecting $1$) or get a new linear implication $A \lolli B$
-to apply the comprehension once. Because we also get another $\compr{C}$ by selecting the right hand side,
-the comprehension can be applied again, recursively.
-
-Aggregates work identically, but they need an extra argument to accumulate the aggregated value. If a sum aggregate $C$ has the form $[\;\m{sum} \Rightarrow y; \; \widehat{x}; \; A; \; B_1; \; B_2 \;]$, then the definition will be as follows:
-
-\[
-\compr{C} \; V \defeq (\lambda v. B_2)V \with (\forall x. ((Ax \lolli B_1) \otimes \compr{C} \; (x + V)))
-\]
-
-The aggregate is initiated as $\compr{C} \; 0$.
 
 \footnotesize
 \begin{center}
@@ -77,6 +54,33 @@ The aggregate is initiated as $\compr{C} \; 0$.
 \end{center}
 \normalsize
 
+
+For definitions, we took inspiration from Baelde's work on least and greatest fixed points in linear logic~\cite{Baelde:2012:LGF:2071368.2071370}. Baelde's system goes beyond
+simple recursive definitions and allows proofs using induction and co-induction in linear logic. Fortunately, the proof system satisfies cut-elimination which
+makes it consistent.
+
+In a comprehension, we want to apply an implication as many matches as the database allows. One way to formally describe comprehensions would be to use persistent
+rules that would be used a few times and then would be forgotten. A more reasonable approach is to use
+definitions. Given a comprehension $C = \{ \; \widehat{x}; \; A; \; B \; \}$ with a body $A$ and a head $B$, then we can build the following recursive definition:
+
+\[
+\compr{C} \defeq 1 \with ((A \lolli B) \otimes \compr{C})
+\]
+
+We can unfold $\compr{C}$ to either stop (by selecting $1$) or get a new linear implication $A \lolli B$
+to apply the comprehension once. Because we also get another $\compr{C}$ by selecting the right hand side,
+the comprehension can be applied again, recursively.
+
+This form of definition does not capture the desired \emph{maximality} aspect of the comprehension,
+since it commits to find a particular form of proof and not all possible proofs. The low level
+operational semantics will ensure maximality.
+
+Aggregates work identically, but they need an extra argument to accumulate the aggregated value. If a sum aggregate $C$ has the form $[\;\m{sum} \Rightarrow y; \; \widehat{x}; \; A; \; B_1; \; B_2 \;]$, then the definition will be as follows (the aggregate is initiated as $\compr{C} \; 0$):
+
+\[
+\compr{C} \; V \defeq (\lambda v. B_2)V \with (\forall x. ((Ax \lolli B_1) \otimes \compr{C} \; (x + V)))
+\]
+
 \subsection{Dynamic Semantics}
 
 The high level dynamic semantics (HLD) formalize the mechanism of matching rules and deriving new facts and is closely related to the fragment presented above.
@@ -85,32 +89,123 @@ We consider the rules of the program as persistent linear implications of the fo
 We ignore the right hand side $C$ of the calculus and use inversion on the $\Delta$ and $\Gamma$ contexts so that we only have atomic terms (facts). To apply rules
 we use chaining by focusing on the derivation rules of $\Phi$.
 
-The HLD semantics are shown in \ref{hlsemantics} and are composed of four main judgments: (i) $\m{run}$ picks some rule and tries to apply it;
-(ii) $\m{apply}$ picks a subset of linear facts from $\Delta$ and tries to match the body of the rule and then derives the head; (iii) $\m{match}$
-verifies that a set of linear facts matches the body; and (iv) $\m{derive}$ instantiates the head of the rule and adds facts to $\Delta_1$ and $\Gamma_1$
-(the contexts for new persistent and linear facts).
+\scriptsize
+\begin{figure}[h]
+\[
+\infer[\az rule]
+{\az \Gamma ; \Delta, \Delta'' ; A \lolli B \rightarrow \Xi' ; \Delta' ; \Gamma'}
+{\mz \Gamma ; \Delta \rightarrow A & \dz \Gamma ; \Delta''; \Delta; \cdot ; \cdot ; B \rightarrow \Xi' ; \Delta' ; \Gamma'}
+\]
 
-We note that the HLD semantics do not take distribution into account, since we assume that the database is global. We also do not model variable bindings
+\[
+\infer[\doz rule]
+{\doz \Gamma ; \Delta ; R, \Phi \rightarrow \Xi' ; \Delta' ; \Gamma'}
+{\az \Gamma ; \Delta ; R \rightarrow \Xi' ; \Delta' ; \Gamma'}
+\]
+
+\[
+\infer[\mz 1]
+{\mz \Gamma; \cdot \rightarrow 1}
+{}
+\tab
+\infer[\mz p]
+{\mz \Gamma; p \rightarrow p }
+{}
+\tab
+\infer[\mz \bang p]
+{\mz \Gamma, p; \cdot \rightarrow \bang p}
+{}
+\]
+
+\[
+\infer[\mz \otimes]
+{\mz \Gamma; \Delta_1, \Delta_2 \rightarrow A \otimes B}
+{\mz \Gamma; \Delta_1 \rightarrow A & \mz \Delta_2 \rightarrow B}
+\]
+
+\[
+\infer[\dz p]
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; p, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; p, \Delta_1 ; \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+\tab
+\infer[\dz \bang p]
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; \bang p, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1, p ; \Delta_1 ; \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+\]
+
+\[
+\infer[\dz \otimes]
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; A \otimes B, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; A, B, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+\tab
+\infer[\dz 1]
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1; \Delta_1 ; 1, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1; \Delta_1 ; \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+\]
+
+\[
+\infer[\dz end]
+{\dz \Gamma ; \Delta ; \Xi' ; \Gamma' ; \Delta' ; \cdot \rightarrow \Xi' ; \Delta' ; \Gamma'}
+{}
+\]
+
+
+\[
+\infer[\dz comp]
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; \comp A \lolli B, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; 1 \with (A \lolli B \otimes \comp A \lolli B), \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+\]
+
+\[
+\infer[\dz \lolli]
+{\dz \Gamma ; \Delta_a, \Delta_b ; \Xi ; \Gamma_1 ; \Delta_1 ; A \lolli B, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+{\mz \Gamma ; \Delta_a \rightarrow A & \dz \Gamma ; \Delta_b ; \Xi, \Delta_a ; \Gamma_1 ; \Delta_1 ; B, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+\]
+
+\[
+\infer[\dz \with L]
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; A \with B, \Omega \rightarrow \Xi' ; \Delta'; \Gamma'}
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; A, \Omega \rightarrow \Xi' ; \Delta'; \Gamma'}
+\tab
+\infer[\dz \with R]
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; A \with B, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; B, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+\]
+
+\caption{High Level Dynamic Semantics.}
+\label{hld_semantics}
+\end{figure}
+\normalsize
+
+The HLD semantics are shown in Fig.~\ref{hld_semantics} and are composed of four main judgments:
+\begin{enumerate}
+   \item $\doz \Gamma; \Delta; \Phi \rightarrow \Xi'; \Delta'; \Gamma'$ picks a rule from $\Phi$ and applies it using facts from $\Gamma$ and $\Delta$. $\Xi'$, $\Delta'$ and $\Gamma'$ are the outputs of the derivation process. $\Xi'$ are the linear facts consumed, $\Delta'$ are the linear facts derived and $\Gamma'$ the new persistent facts;
+   \item $\az \Gamma; \Delta; R \rightarrow \Xi'; \Delta'; \Gamma'$ picks a subset of linear facts from $\Delta$ and matches the body of the rule and then derives the head;
+   \item $\mz \Gamma; \Delta \rightarrow A$ verifies that $\Delta$ satisfies the term $A$;
+   \item $\dz \Gamma; \Delta; \Xi; \Gamma_1; \Delta_1, \Omega \rightarrow \Xi'; \Delta'; \Gamma'$ instantiates the ordered head terms $\Omega$ and adds them to $\Delta_1$ and $\Gamma_1$.
+   (the contexts for new persistent and linear facts);
+\end{enumerate}
+
+We note that the HLD semantics do not take distribution into account, since we assume that the database is global. We also omit the quantifiers and do not deal with unification
 since it complicates the formal system. The low level dynamic semantics (LLD) shown in \ref{low_level_semantics} improve upon HLD by adding rule priorities, by removing the non-determinism
 when matching the body of rules by modeling all the steps and by applying comprehensions or aggregates as many times as the database allows.
-LLD is closely related to our virtual machine, thus it is a good starting point to understand our implementation.
+LLD is closely related to our virtual machine, thus it is a good specification of our implementation.
 
 In LLD we try all the rules in order. For each rule, we use a \emph{continuation stack} to store the \emph{continuation frames} created by each fact template $p$ present
 in the body of the rule. Each frame considers all the facts relevant to the template given the current variable bindings ($\mo$rules), that may or not fail during the
-remaining matching process. It contains enough state to resume the matching process at the time of its creation, including which facts of the predicate $p$
-we can still try.
+remaining matching process.
+If we fail, we backtrack to try other alternatives
+(through $\cont$rules). If the continuation stack becomes empty, we backtrack to try the
+next rule (rule $\cont next \; rule$). When we succeed the facts consumed
+are known ($\mo end$).
 
-Whenever we fail to find a fact to match some part of the body, we fail and force the matching process to backtrack in order to try other alternatives (through $\cont$rules).
-If the continuation stack becomes empty, we backtrack again to try the next rule (rule $\cont next \; rule$). On the other hand, if the body of a rule is fully matched (rule $\mo end$),
-we end up determining which linear facts from the database are consumed. In HDL this set of facts is \emph{guessed}, but LLD computes them deterministically.
-
-\subsubsection{Comprehensions}
-
-The derivation process in LLD is similar to the one used in HDL, except for the case of comprehensions or aggregates. If we find such construct during
-derivation ($\done comp$), we need to create a new continuation stack and start matching the body of the construct exactly as we did with the body of the rule.
-When we match the body of the comprehension ($\mc$judgment), we fully derive the head ($\dc$judgment) and then we reuse the continuation stack to find which other combinations of the
-database facts can be consumed ($\dc end$). By definition, the continuation stack contains enough information to iterate through all the possible combinations
-of the database.
+The derivation process in LLD is similar to the one used in HDL, except for the case of comprehensions
+or aggregates. For such cases ($\done comp$), we need to create a continuation stack and start matching
+the body of the construct as we did before.
+When we match the body ($\mc$judgment), we fully derive the head ($\dc$judgment) and then we reuse
+the continuation stack to find which other combinations of the
+database facts can be consumed ($\dc end$). By definition, the continuation stack contains
+enough information to go through all combinations in the database.
 
 However, in order to reuse the stack, we need to \emph{fix} it by removing all the frames pushed after the first continuation frame
 of a linear fact. If we tried to use those frames, we would assumed that the linear facts used by the other frames were still in the database, but that
@@ -124,6 +219,18 @@ This is performed by rules using the $\strans$and $\dall$judgments.
 We finally stop applying the comprehension when the continuation stack is empty ($\contc end$). 
 Aggregates use the same mechanism as comprehensions, however we also need to keep track of the accumulated value.
 
+\subsection{Soundness}
+
+The soundness theorem proves that if a rule was successfully derived in the LLD semantics then it can also be derived in the HLD semantics. The completeness theorem cannot
+be proven since LLD lacks the non-determinism inherent in HLD.
+
+We prove that matching the body of a rule in LLD can also be performed in HLD (matching soundness) and that deriving the head of the rule is also sound (derivation soundness). The matching soundness uses induction on the size of the continuation frames, the size of the continuation stack and the size of terms to match to reconstitute a particular matching tree in HLD.
+
+The derivation soundness lemma is trivial except for the case of comprehensions and aggregates. For such cases we use the matching soundness lemma applied $n$ times (for maximality) and then rebuild the derivation tree in HLD using $2 n$ matching and derivation judgments. These can be retrieved by applying
+induction on size of the continuation stack and continuation frames.\footnote{Details can be
+found in \url{https://github.com/flavioc/formal-meld/blob/master/doc.pdf?raw=true}.}
+
+\begin{comment}
 \subsubsection{Soundness}
 
 The soundness theorem proves that if a rule was successfully derived in the LLD semantics then it can also be derived in the HLD semantics. The completeness theorem cannot
@@ -154,12 +261,12 @@ This lemma uses a more complicated theorem that is recursively defined through j
 size of the continuation stack, the size of the remaining terms to match and also the size of alternatives at each continuation frame. We always ensure that the
 continuation stack stays consistent at all times, when backtracking or moving forward. Theorem is presented in Appendix~\ref{main_soundness_theorem}.
  
-The second stepping stone in the soundness proof is the derivation lemma. After we successfully match the
-body of a rule, we need to prove that the derivation process (through judgments $\m{derive}_1$) is also
-sound. This lemma is as follows:
+The second stepping stone in the soundness proof is the derivation lemma. After we successfully match
+the body of a rule, we need to prove that the derivation process (through judgments $\m{derive}_1$)
+is also sound. This lemma is as follows:
 
 \begin{lemma}[Derivation]
-   If $\do \Gamma; \Delta; \Xi; \Gamma_1; \Delta_1; \Omega \rightarrow \Xi'; \Delta'; \Gamma'$ then $\dz \Gamma; \Delta; \Gamma_1; \Delta_1; \Omega \rightarrow \Xi'; \Delta'; \Gamma'$.
+   If $\done \Gamma; \Delta; \Xi; \Gamma_1; \Delta_1; \Omega \rightarrow \Xi'; \Delta'; \Gamma'$ then $\dz \Gamma; \Delta; \Gamma_1; \Delta_1; \Omega \rightarrow \Xi'; \Delta'; \Gamma'$.
 \end{lemma}
 \begin{proof}
    Straightforward use of induction on $\Omega$ (the terms of the head) except for the sub-case of comprehensions and aggregates, where we need to use the comprehension and aggregate theorems to construct the derivation tree using $n$ applications of the corresponding construct.
@@ -171,3 +278,4 @@ times (as many as many comprehensions can be applied). Using induction on the co
 $n$ (where $n \ge 0$) applications of the comprehension and $n \; \m{match}$ and $n \; \m{derive}$ judgments
 that can be used to rebuild the derivation tree at the low level by using the $\dz \with L$, $\dz \with R$
 and $\dz \lolli$ rules to fold and unfold the comprehension term. The theorem for aggregates works similarly.
+\end{comment}

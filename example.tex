@@ -9,8 +9,8 @@ The database of facts can be seen as a graph data structure where each node or v
 fraction of the database.  Since derivation rules can only manipulate facts belonging to
 a node, we are able to perform independent rule derivations.
 
-Each fact is an association between a \emph{predicate} and a tuple of values. A predicate is a pair with a name and a tuple of types (the argument types).
-LM rules are type-checked using the predicate declarations in the header of the program. LM has a simple type system that includes the following simples types:
+Each fact is a predicate on a tuple of \emph{values}, where the type of the predicate prescribes the types of the arguments.
+LM rules are type-checked using the predicate declarations in the header of the program. LM has a simple type system that includes types such as
 \emph{node}, \emph{int}, \emph{float}, \emph{string}, \emph{bool}. Recursive types such as \emph{list X} and \emph{pair X; Y} are
 also allowed.
 
@@ -22,20 +22,21 @@ The database of the program can then be partitioned by the first argument of eac
 
 Each rule in LM has a defined priority that is inferred from its position in the source file.
 Rules at the beginning of the file have higher priority. At the node level, we consider all
-the new facts that have been not consider before to create a set of \emph{candidate rules}.
+the new facts that have been not consider yet to create a set of \emph{candidate rules}.
 The set of candidate rules is then applied (by priority) and updated as new facts are derived.
 
 Our first program example is shown in Fig.~\ref{code:message}. This is a message routing program
 that simulates message transmission through a network of nodes.
 We first declare all the predicates (lines 1-2), which represent the kinds of facts we are going to
 use. The first argument of every predicate must be typed as a \texttt{node}, which represents the location of the fact in
-the graph data structure. Predicate \texttt{edge/2} is a non \texttt{linear} (persistent) predicate while \texttt{message/3} is linear.
-The second argument of \texttt{message/2} is the message content represented as a \texttt{string}
-while the third argument is the route list.
+the graph data structure.
+Predicate \texttt{edge/2} is a non \texttt{linear} (persistent) predicate and \texttt{message/3} is linear. While linear facts may be retracted, persistent facts are always
+true once they are derived.
 
 The program rules are declared in lines 4-8, while the program's axioms are written in lines 10-11.
-When persistent facts are used in rules (line 5) they must be
-preceded by \texttt{!}. This helps the programmer in distinguishing between persistent facts and linear facts.
+The general form of a rule is $\mathtt{A_1},...,\mathtt{A_n}$ \texttt{-o} $\mathtt{B_1},...,\mathtt{B_m}$, where $\mathtt{A_1},...,\mathtt{A_n}$ are matched against local facts and $\mathtt{B_1},...,\mathtt{B_m}$ are locally asserted or transmitted to a neighboring node.
+When persistent facts are used (line 5) they must be
+preceded by \texttt{!} for readability.
 
 \begin{figure}[h!]
 \small\begin{Verbatim}[numbers=left]
@@ -63,7 +64,7 @@ When the route list is empty, the message has reached its destination and thus i
 
 Figure~\ref{code:visit} presents another complete LM program that, for a given graph
 of nodes, performs a visit to all nodes reachable from node $@1$.
-The first rule of the program (lines 6-7) is fired when a node \texttt{A} has a \texttt{visit(A)} and a \texttt{unvisited(A)} fact.
+The first rule of the program (lines 6-7) is fired when a node \texttt{A} has a \texttt{visit(A)} and a \texttt{unvisited(A)} facts.
 When fired, we first derive \texttt{visited(A)} to mark node \texttt{A} as \textit{visited} and use a
 \emph{comprehension} to go through all the edge facts \texttt{edge(A,B)} and derive \texttt{visit(B)} for each
 one (comprehensions are explained next in detail). This forces those nodes to be visited also.

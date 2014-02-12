@@ -4,10 +4,10 @@
 \newcommand{\aggregate}[0]{[\;\m{aop} \Rightarrow y; \; \widehat{x}; \; BE; \; HE_1; \; HE_2 \;]}
 
 Table~\ref{tbl:ast} shows the abstract syntax for rules in LM.
-A LM program $Prog$ consists of a set of derivation rules $\Sigma$ and a database $D$.
+An LM program $Prog$ consists of a set of derivation rules $\Sigma$ and a database $D$.
 A derivation rule $R$ may be written as $BE \lolli HE$ where $BE$ is the body of the rule and
-$HE$ is the head. We can also use rule wide variables using $\; \forall_{x}. R$, so that we can instantiate
-shared variables in the body and the head.
+$HE$ is the head.
+We can also explicitly universally quantify over variables in a rule using $\; \forall_{x}. R$.
 If we want to control how facts are selected in the body, we may use \emph{selectors} of
 the form $\selector$ (explained later).
 
@@ -25,7 +25,7 @@ the form $\selector$ (explained later).
   Persistent Facts & $P$ & $::=$ & $\bang p(\hat{x})$\\
   Constraints & $C$ & $::=$ & $c(\hat{x})$ \\
   
-  Exists constructs & $EE$ & $::=$ & $exists \; \widehat{x}. (HE)$ \\
+  Exists constructs & $EE$ & $::=$ & $\exists_{\widehat{x}}. HE$ \\
   Comprehensions & $CE$ & $::=$ & $\comprehension$ \\
   Aggregates & $AE$ & $::=$ & $\aggregate$ \\
   
@@ -47,7 +47,7 @@ be true in order for the rule to be fired (for example, \texttt{C~=~A~+~B}). Con
 The head of a rule ($HE$) contains linear ($L$) and persistent ($P$) \emph{fact templates} which are uninstantiated facts and will derive new facts. The head can also have \emph{exist constructs} ($EE$), \emph{comprehensions} ($CE$) and \emph{aggregates} ($AE$). All those constructs
 may use all the variables instantiated in the body. We can also use an empty head by choosing $1$.
 
-\subsection{Selectors}
+\paragraph{Selectors}
 
 When a rule body is instantiated using facts from the database, facts are picked
 non-deterministically. While our system uses an implementation dependent order for
@@ -66,7 +66,7 @@ In this case, we order the \texttt{weight} facts by \texttt{W} in ascending orde
 to match them. Other operations available are \texttt{:max} and \texttt{:random} (to force no pre-defined order at the
 implementation level).
 
-\subsection{Exists Constructs}
+\paragraph{Exists Constructs}
 
 Exists constructs ($EE$) are based on the linear logic construct of the same name and are used to create new node addresses.
 We can use the new address to instantiate new facts for this node.  
@@ -77,25 +77,25 @@ The following example illustrates the use of the exists construct, where we deri
 do-work(A, W) -o exists B. (perform-work(B, W)).
 \end{Verbatim}
 
-\subsection{Comprehensions}
+\paragraph{Comprehensions}
 
 Sometimes we need to consume a linear fact and then immediately generate several facts depending on
 the contents of the database. To solve this particular need, we created the concept of comprehensions, which are
 sub-rules that are applied with all possible combinations of facts from the database. In a comprehension $\comprehension$, $\widehat{x}$ is a list of variables, $BE$ is the body of the comprehension and $HE$ is the head.
 The body $BE$ is used to generate all possible combinations for the head $HE$, according to the facts
-in the database. Note that this body is also locally restricted just like the body of a rule. 
+in the database. Note that this body is also locally restricted, just like the body of a rule. 
 
 We have already seen an example of comprehensions in the visit program (Fig.~\ref{code:visit} line 8).
 Here, we match \texttt{!edge(A, B)} using all the combinations available in the database and for each combination we derive \texttt{visit(B)}.
 
-\subsection{Aggregates}
+\paragraph{Aggregates}
 
 Another useful feature in logic programs is the ability to reduce several facts into a single fact.
-In LM we have aggregates ($AE$), a special kind of sub-rule that work very similarly to comprehensions.
+In LM we have aggregates ($AE$), a special kind of sub-rule similar to comprehensions.
 In the abstract syntax $\aggregate$, $\m{aop}$ is the aggregate operation, $\widehat{x}$ is the list of variables
 introduced in $BE$, $HE_1$ and $HE_2$ and $y$ is the variable in the body
-$BE$ that represents the values to be aggregated using $\m{aop}$. Like for comprehensions,
-we use $\widehat{x}$ to try all the combinations of $BE$, but, in addition to deriving $HE_1$ for each combination,
+$BE$ that represents the values to be aggregated using $\m{aop}$.
+We use $\widehat{x}$ to try all the combinations of $BE$, but, in addition to deriving $HE_1$ for each combination,
 we aggregate the values represented by $y$ and derive $HE_2$ only once using $y$.
 
 Let's consider a database with the following facts and a rule:

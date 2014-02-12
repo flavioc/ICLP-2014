@@ -1,103 +1,6 @@
 
 \section{Programs}
 
-\begin{comment}
-\subsection{Bipartiteness Checking program}\label{code:bichecking}
-
-\begin{figure}[h!]
-\footnotesize\begin{Verbatim}[numbers=left]
-type edge(node, node).
-type linear visit(node, int).
-type linear unchecked(node).
-type linear checked(node, int).
-type linear fail(node).
-
-fun next(int X) : int = if X <> 1 then 1 else 2 end.
-
-visit(@1, 1).
-
-visit(A, P), unchecked(A)
-   -o {B | !edge(A, B) | visit(B, next(P))}, checked(A, P).
-
-visit(A, P), checked(A, P) -o checked(A, P).
-visit(A, P1), checked(A, P2), P1 <> P2 -o fail(A).
-visit(A, P), fail(A) -o fail(A).
-\end{Verbatim}
-\end{figure}
-\normalsize
-\end{comment}
-
-\subsection{Shortest Distance program}\label{code:shortest_path}
-
-\begin{figure}[h!]
-\footnotesize\begin{Verbatim}[numbers=left]
-type edge(node, node, int).
-type linear path(node, int, int).
-
-const used = 1.
-const notused = 0.
-
-path(startnode, 0, notused).
-
-path(A, B, used), path(A, B, notused)
-   -o path(A, B, used).
-
-path(A, B1, X), path(A, B2, Y), B1 <= B2
-   -o path(A, B1, X).
-
-path(A, D, notused), A <> finalnode
-   -o {B, W | !edge(A, B, W) | path(B, D + W, notused)}, path(A, D, used).
-\end{Verbatim}
-\end{figure}
-\normalsize
-
-\clearpage
-\subsection{PageRank}\label{code:pagerank}
-
-\begin{figure}[h!]
-   \footnotesize\begin{Verbatim}[numbers=left]
-type output(node, node, float).
-type linear pagerank(node, float, int).
-type numLinks(node, int).
-type numInput(node, int).
-type linear accumulator(node, float, int, int).
-type linear newrank(node, node, float, int).
-type linear start(node).
-
-const damping = 0.85.
-const iterations = str2int(@arg1).
-const pages = @world.
-
-start(A).
-
-start(A),
-!numInput(A, T)
-   -o accumulator(A, 0.0, T, 1),
-      pagerank(A, 1.0 / float(pages), 0).
-
-// distribute rank
-pagerank(A, V, Id),
-!numLinks(A, C),
-Id < iterations,
-Result = V / float(C)
-	-o {B, W | !output(A, B, W) | newrank(B, A, Result, Id + 1)}.
-
-// compute new rank
-accumulator(A, Acc, 0, Id),
-!numInput(A, T),
-V = damping + (1.0 - damping) * Acc,
-Id <= iterations
-	-o pagerank(A, V, Id), accumulator(A, 0.0, T, Id + 1).
-	
-// accumulate rank
-newrank(A, B, V, Id), accumulator(A, Acc, T, Id), T > 0
-   -o [sum => S, count => C | D | newrank(A, D, S, Id) |
-            1 | accumulator(A, Acc + V + S, T - 1 - C, Id)].
-\end{Verbatim}
-\normalsize
-\end{figure}
-
-\clearpage
 \subsection{N-Queens program}\label{code:nqueens}
 
 \begin{figure}[h!]
@@ -170,57 +73,6 @@ send-down(A, Nodes, Coords)
 \end{Verbatim}
 \end{figure}
 \normalsize
-
-\begin{comment}
-\clearpage
-\subsection{Quick-Sort program}\label{code:quicksort}
-
-\begin{figure}[h!]
-\footnotesize\begin{Verbatim}[numbers=left]
-type back(node, node).
-type linear down(node, list int).
-type linear up(node, list int).
-type linear sorted(node, node, list int).
-type linear buildpivot(node, list int, int, list int, list int).
-type linear waitpivot(node, node, node, int).
-type linear append(node, list int, list int).
-type linear reverse(node, list int, list int, list int).
-type linear reverse2(node, list int, list int).
-
-down(@0, tosort).
-
-down(A, []) -o up(A, []).
-down(A, [X]) -o up(A, [X]).
-down(A, [X, Y]), X < Y -o up(A, [X, Y]).
-down(A, [X, Y]), X >= Y -o up(A, [Y, X]).
-down(A, [X | L]) -o buildpivot(A, L, X, [], []).
-
-buildpivot(A, [], X, Smaller, Greater)
-   -o exists B, C. (back(B, A), down(B, Smaller),
-            back(C, A), down(C, Greater), waitpivot(A, B, C, X)).
-
-buildpivot(A, [Y | L], X, Smaller, Greater), Y <= X
-   -o buildpivot(A, L, X, [Y | Smaller], Greater).
-buildpivot(A, [Y | L], X, Smaller, Greater), Y > X
-   -o buildpivot(A, L, X, Smaller, [Y | Greater]).
-   
-waitpivot(A, NodeSmaller, NodeGreater, Pivot),
-sorted(A, NodeSmaller, Smaller),
-sorted(A, NodeGreater, Greater)
-   -o append(A, Smaller, [Pivot | Greater]).
-
-append(A, L1, L2) -o reverse(A, L1, L2, []).
-
-reverse(A, [], L2, L3) -o reverse2(A, L3, L2).
-reverse(A, [X | L], L2, L3) -o reverse(A, L, L2, [X | L3]).
-reverse2(A, [], Result) -o up(A, Result).
-reverse2(A, [X | L1], L2) -o reverse2(A, L1, [X | L2]).
-
-up(A, L), back(A, B) -o sorted(B, A, L).
-\end{Verbatim}
-\end{figure}
-\normalsize
-\end{comment}
 
 \clearpage
 \section{Linear Logic fragment used in LM}\label{linear_logic}
@@ -321,101 +173,20 @@ up(A, L), back(A, B) -o sorted(B, A, L).
 \end{figure}
 
 \clearpage
-\section{High Level Dynamic Semantics}\label{hlsemantics}
-
-\[
-\infer[\az rule]
-{\az \Gamma ; \Delta, \Delta'' ; A \lolli B \rightarrow \Xi' ; \Delta' ; \Gamma'}
-{\mz \Gamma ; \Delta ; A \rightarrow \Delta & \dz \Gamma ; \Delta''; \Delta; \cdot ; \cdot ; B \rightarrow \Xi' ; \Delta' ; \Gamma'}
-\]
-
-\[
-\infer[\doz rule]
-{\doz \Gamma ; \Delta ; R, \Phi \rightarrow \Xi' ; \Delta' ; \Gamma'}
-{\doz \Gamma ; \Delta ; R \rightarrow \Xi' ; \Delta' ; \Gamma'}
-\]
-
-\[
-\infer[\mz 1]
-{\mz \Gamma; \cdot \rightarrow 1}
-{}
-\tab
-\infer[\mz p]
-{\mz \Gamma; p \rightarrow p }
-{}
-\tab
-\infer[\mz \bang p]
-{\mz \Gamma, p; \cdot \rightarrow \bang p}
-{}
-\]
-
-\[
-\infer[\mz \otimes]
-{\mz \Gamma; \Delta_1, \Delta_2 \rightarrow A \otimes B}
-{\mz \Gamma; \Delta_1 \rightarrow A & \mz \Delta_2 \rightarrow B}
-\]
-
-\[
-\infer[\dz p]
-{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; p, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
-{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; p, \Delta_1 ; \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
-\]
-
-\[
-\infer[\dz \bang p]
-{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; \bang p, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
-{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1, p ; \Delta_1 ; \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
-\]
-
-\[
-\infer[\dz \otimes]
-{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; A \otimes B, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
-{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; A, B, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
-\]
-
-\[
-\infer[\dz 1]
-{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1; \Delta_1 ; 1, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
-{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1; \Delta_1 ; \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
-\]
-
-\[
-\infer[\dz end]
-{\dz \Gamma ; \Delta ; \Xi' ; \Gamma' ; \Delta' ; \cdot \rightarrow \Xi' ; \Delta' ; \Gamma'}
-{}
-\]
-
-
-\[
-\infer[\dz comp]
-{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; \comp A \lolli B, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
-{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; 1 \with (A \lolli B \otimes \comp A \lolli B), \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
-\]
-
-\[
-\infer[\dz \lolli]
-{\dz \Gamma ; \Delta_a, \Delta_b ; \Xi ; \Gamma_1 ; \Delta_1 ; A \lolli B, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
-{\mz \Gamma ; \Delta_a \rightarrow A & \dz \Gamma ; \Delta_b ; \Xi, \Delta_a ; \Gamma_1 ; \Delta_1 ; B, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
-\]
-
-\[
-\infer[\dz \with L]
-{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; A \with B, \Omega \rightarrow \Xi' ; \Delta'; \Gamma'}
-{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; A, \Omega \rightarrow \Xi' ; \Delta'; \Gamma'}
-\]
-
-\[
-\infer[\dz \with R]
-{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; A \with B, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
-{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; B, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
-\]
-
-\clearpage
 \section{Low Level Dynamic Semantics}\label{low_level_semantics}
 
-\footnotesize
+All the judgments in this system share a few arguments, namely:
+
+\begin{itemize}
+   \item[$\Gamma$]: Set of persistent facts.
+   \item[$\Xi'$]: Multi-set of facts consumed during the whole process (output).
+   \item[$\Delta'$]: Multi-set of linear facts derived after applying one rule (output).
+   \item[$\Gamma'$]: Set of persistent facts derived after applying one rule (output).
+\end{itemize}
 
 \subsection{Application}
+
+The whole process is started by the $\doo$and $\ao$judgments. The $\doo \Gamma; \Delta; \Phi \rightarrow \Xi'; \Delta'; \Gamma'$ judgment starts with facts $\Delta$ and $\Gamma$ and an ordered list of rules that can be applied $\Phi$. The $\ao \Gamma; \Delta; A \lolli B; R \rightarrow \Xi'; \Delta'; \Gamma'$ tries to apply the rule $A \lolli B$ and stores the rule continuation $R$ so that if the current rule fails, we can try another one (in order).
 
 \[
 \infer[\ao start \; matching]
@@ -431,6 +202,20 @@ up(A, L), back(A, B) -o sorted(B, A, L).
 
 
 \subsection{Match}
+
+The matching judgment uses the form $\mo \Gamma; \Delta; \Xi; \Omega; H; C; R \rightarrow \Xi'; \Delta'; \Gamma'$:
+
+\begin{enumerate}
+   \item[$\Delta$]: Multi-set of linear facts still available to complete the matching process.
+   \item[$\Xi$]: Multi-set of linear facts consumed up to this point.
+   \item[$\Omega$]: Ordered list of terms we want to match.
+   \item[$H$]: Head of the rule.
+   \item[$C$]: Ordered list of frames representing the continuation stack.
+   \item[$R$]: Rule continuation. If the matching process fails, we try another rule.
+\end{enumerate}
+
+Matching will attempt to use facts from $\Delta$ and $\Gamma$ to match the terms of the body of the rule represented as $\Omega$. During this process continuation frames are pushed into $C$.
+If the matching process fails, we use the continuation stack through the $\cont$judgment. Note that we use different continuation frames for persistent and linear facts.
 
 \[
 \infer[\mo p \; ok \; first]
@@ -496,6 +281,14 @@ up(A, L), back(A, B) -o sorted(B, A, L).
 
 \subsection{Continuation}
 
+If the previous matching process fails, we pick the top frame from the stack $C$ and restore the matching process using another fact and/or context. The continuation judgment $\cont C; P; H; R; \Gamma; \Xi'; \Delta'; \Gamma'$ deals with the backtracking process where the meaning of each argument is as follows:
+
+\begin{enumerate}
+   \item[$C$]: Continuation stack.
+   \item[$H$]: Head of the current rule we are trying to match.
+   \item[$R$]: Next available rules if the current one does not match.
+\end{enumerate}
+
 \[
 \infer[\cont next \; rule]
 {\cont \cdot; H; (\Phi, \Delta); \Gamma ; \Xi'; \Delta'; \Gamma'}
@@ -528,6 +321,16 @@ up(A, L), back(A, B) -o sorted(B, A, L).
 
 \subsection{Derivation}
 
+Once the list of terms $\Omega$ in the $\mo$judgment is exhausted, we derive the terms of the head of rule.
+The derivation judgment uses the form $\done \Gamma; \Delta; \Xi; \Gamma_1; \Delta_1; \Omega \rightarrow \Xi'; \Delta'; \Gamma'$:
+
+\begin{enumerate}
+   \item[$\Delta$]: Multi-set of linear facts we started with minus the linear facts consumed during the matching of the body of the rule.
+   \item[$\Xi$]: Multi-set of linear facts consumed during the matching of the body of the rule.
+   \item[$\Gamma_1$]: Set of persistent facts derived up to this point in the derivation.
+   \item[$\Delta_1$]: Multi-set of linear facts derived up to this point in the derivation.
+   \item[$\Omega$]: Remaining terms to derive as an ordered list. We start with $B$ if the original rule is $A \lolli B$.
+\end{enumerate}
 
 \[
 \infer[\done p]
@@ -564,6 +367,26 @@ up(A, L), back(A, B) -o sorted(B, A, L).
 \]
 
 \subsection{Match Comprehension}
+
+The matching process for comprehensions is similar to the process used for matching the body of the rule, however
+we use two continuation stacks, $C$ and $P$. In $P$, we put all the initial persistent frames and in $C$ we put the first linear frame and then everything else.
+With this we can easily find out the first linear frame and remove everything that was pushed on top of such frame.
+The full judgment has the form
+$\mc \Gamma; \Delta; \Xi_N; \Gamma_{N1}; \Delta_{N1}; \Xi; \Omega; C; P; AB; \Omega_N; \Delta_N \rightarrow \Xi'; \Delta'; \Gamma'$:
+
+\begin{enumerate}
+   \item[$\Delta$]: Multi-set of linear facts remaining up to this point in the matching process.
+   \item[$\Xi_N$]: Multi-set of linear facts used during the matching process of the body of the rule.
+   \item[$\Gamma_{N1}$]: Set of persistent facts derived up to this point in the head of the rule.
+   \item[$\Delta_{N1}$]: Multi-set of linear facts derived by the head of the rule.
+   \item[$\Xi$]: Multi-set of linear facts consumed up to this point.
+   \item[$\Omega$]: Ordered list of terms that need to be matched for the comprehension to be applied.
+   \item[$C$]: Continuation stack that contains both linear and persistent frames. The first frame must be linear.
+   \item[$P$]: Initial part of the continuation stack with only persistent frames.
+   \item[$AB$]: Comprehension $\comp A \lolli B$ that is being matched.
+   \item[$\Omega_N$]: Ordered list of remaining terms of the head of the rule to be derived.
+   \item[$\Delta_N$]: Multi-set of linear facts that were still available after matching the body of the rule. Note that $\Delta, \Xi = \Delta_N$.
+\end{enumerate}
 
 \scriptsize
 
@@ -642,6 +465,17 @@ up(A, L), back(A, B) -o sorted(B, A, L).
 
 \subsection{Match Comprehension Continuation}
 
+If the matching process fails, we need to backtrack to the previous frame and restore the matching process at that point. The judgment that backtracks has the form $\contc \Gamma; \Delta_N; \Xi_N; \Delta_{N1}; C; AB; \Omega_N \rightarrow \Xi'; \Delta'; \Gamma'$:
+
+\begin{enumerate}
+   \item[$\Delta_N$]: Multi-set of linear facts that were still available after matching the body of the rule.
+   \item[$\Xi_N$]: Multi-set of linear facts used during matching of the body of the rule.
+   \item[$\Gamma_{N1}$]: Set of persistent facts derived by the head of the rule.
+   \item[$\Delta_{N1}$]: Multi-set of linear facts derived by the head of the rule.
+   \item[$C, P$]: Continuation stacks.
+   \item[$AB$]: Comprehension $\comp A \lolli B$ that is being matched.
+   \item[$\Omega_N$]: Ordered list of remaining terms of the head of the rule to be derived.
+\end{enumerate}
 
 \[
 \infer[\contc end]
@@ -687,6 +521,20 @@ up(A, L), back(A, B) -o sorted(B, A, L).
 
 \subsection{Stack Transformation}
 
+After a comprehension is matched and before we derive the head of such comprehension, we need to "fix" the continuation stack. In a nutshell, we remove all the frames except the first frame and remove the consumed linear facts from the remaining frames so that they are still valid for the next application of the comprehension.
+The judgment that fixes the stack has the form $\dall \Gamma; \Xi_N; \Gamma_{N1}; \Delta_{N1}; \Xi; C; P; AB; \Omega_N; \Delta_N \rightarrow \Xi'; \Delta'; \Gamma'$:
+
+\begin{enumerate}
+   \item[$\Xi_N$]: Multi-set of linear facts used during the matching process of the body of the rule.
+   \item[$\Gamma_{N1}$]: Set of persistent facts derived by the head of the rule.
+   \item[$\Delta_{N1}$]: Multi-set of linear facts derived by the head of the rule.
+   \item[$\Xi$]: Multi-set of linear facts consumed by the previous application of the comprehension.
+   \item[$C$]: Continuation stack for the comprehension.
+   \item[$AB$]: Comprehension $\comp A \lolli B$ that is being matched.
+   \item[$\Omega_N$]: Ordered list of remaining terms of the head of the rule to be derived.
+   \item[$\Delta_N$]: Multi-set of linear facts that were still available after matching the body of the rule.
+\end{enumerate}
+
 \[
 \infer[\strans]
 {\strans \Xi; [\Gamma'; \Delta_N; \cdot; \bang p; \Omega; \cdot; \Upsilon], P; [\Gamma'; \Delta_N - \Xi; \cdot; \bang p, \Omega; \cdot; \Upsilon], P'}
@@ -698,7 +546,6 @@ up(A, L), back(A, B) -o sorted(B, A, L).
 {\strans \Xi; \cdot; \cdot}
 {\strans \Xi; \cdot; \cdot}
 \]
-
 
 \[
 \infer[\dall end \; linear]
@@ -720,6 +567,19 @@ up(A, L), back(A, B) -o sorted(B, A, L).
 \]
 
 \subsection{Comprehension Derivation}
+
+After the fixing process, we start deriving the head of the comprehension. All the facts derived go directly to $\Gamma_{1}$ and $\Delta_{1}$. The judgment has the form $\dc \Gamma; \Xi; \Gamma_1; \Delta_1; \Omega; C; P; AB; \Omega_N; \Delta_N \rightarrow \Xi'; \Delta'; \Gamma'$:
+
+\begin{enumerate}
+   \item[$\Xi$]: Multi-set of linear facts consumed both by the body of the rule and all the comprehension applications.
+   \item[$\Gamma_1$]: Set of persistent facts derived by the head of the rule and comprehensions.
+   \item[$\Delta_1$]: Multi-set of linear facts derived by the head of the rule and comprehensions.
+   \item[$\Omega$]: Ordered list of terms to derive.
+   \item[$C, P$]: New continuation stacks.
+   \item[$AB$]: Comprehension $\comp A \lolli B$ that is being derived.
+   \item[$\Omega_N$]: Ordered list of remaining terms of the head of the rule to be derived.
+   \item[$\Delta_N$]: Multi-set of remaining linear facts that can be used for the next comprehension applications.
+\end{enumerate}
 
 \[
 \infer[\dc p]
@@ -745,8 +605,8 @@ up(A, L), back(A, B) -o sorted(B, A, L).
 {\contc \Gamma; \Delta_N; \Xi; \Gamma_1; \Delta_1; C; P; \comp A \lolli B; \Omega_N \rightarrow \Xi'; \Delta'; \Gamma'}
 \]
 
+\begin{comment}
 \section{Main Matching Soundness Theorem}\label{main_soundness_theorem}
-
 
 \begin{theorem}[Matching Soundness]
 
@@ -788,3 +648,5 @@ If $\cont C; H; R; \Gamma; \Xi'; \Delta'; \Gamma'$ and $C$ is well formed in rel
 \begin{proof}
 Proof by mutual induction except for the case $\cont next \; rule$ which is trivial. In $\mo$on the size of $\Omega$ and on $\cont$on the size of the current frame and the continuation stack $C$. During the proof we use an \emph{equivalence relation} for terms in order to prove that two \emph{identical terms} can be matched using the same linear context at the HLD semantics.\footnote{Full details of the proof in \url{http://github.com/flavioc/formal-meld}}.
 \end{proof}
+
+\end{comment}
