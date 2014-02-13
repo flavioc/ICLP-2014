@@ -21,7 +21,7 @@
 \newcommand{\ao}{\m{apply}_1 \;}
 
 We now present the sequent calculus of a fragment of intuitionistic linear
-logic~\cite{Girard95logic:its} used by LM followed by the dynamic semantics built on top of
+logic~\cite{girard-87} used by LM followed by the dynamic semantics built on top of
 this fragment.
 
 The fragment of linear logic used by LM is presented in \ref{linear_logic}.
@@ -91,16 +91,17 @@ we use chaining by focusing on the derivation rules of $\Phi$.
 
 \scriptsize
 \begin{figure}[h]
-\[
-\infer[\az rule]
-{\az \Gamma ; \Delta, \Delta'' ; A \lolli B \rightarrow \Xi' ; \Delta' ; \Gamma'}
-{\mz \Gamma ; \Delta \rightarrow A & \dz \Gamma ; \Delta''; \Delta; \cdot ; \cdot ; B \rightarrow \Xi' ; \Delta' ; \Gamma'}
-\]
 
 \[
 \infer[\doz rule]
 {\doz \Gamma ; \Delta ; R, \Phi \rightarrow \Xi' ; \Delta' ; \Gamma'}
 {\az \Gamma ; \Delta ; R \rightarrow \Xi' ; \Delta' ; \Gamma'}
+\]
+
+\[
+\infer[\az rule]
+{\az \Gamma ; \Delta, \Delta'' ; A \lolli B \rightarrow \Xi' ; \Delta' ; \Gamma'}
+{\mz \Gamma ; \Delta \rightarrow A & \dz \Gamma ; \Delta''; \Delta; \cdot ; \cdot ; B \rightarrow \Xi' ; \Delta' ; \Gamma'}
 \]
 
 \[
@@ -177,34 +178,32 @@ we use chaining by focusing on the derivation rules of $\Phi$.
 \end{figure}
 \normalsize
 
-The HLD semantics are shown in Fig.~\ref{hld_semantics} and are composed of four main judgments:
+The HLD semantics are shown in Fig.~\ref{hld_semantics} and are composed of four judgments:
 \begin{enumerate}
    \item $\doz \Gamma; \Delta; \Phi \rightarrow \Xi'; \Delta'; \Gamma'$ picks a rule from $\Phi$ and applies it using facts from $\Gamma$ and $\Delta$. $\Xi'$, $\Delta'$ and $\Gamma'$ are the outputs of the derivation process. $\Xi'$ are the linear facts consumed, $\Delta'$ are the linear facts derived and $\Gamma'$ the new persistent facts;
-   \item $\az \Gamma; \Delta; R \rightarrow \Xi'; \Delta'; \Gamma'$ picks a subset of linear facts from $\Delta$ and matches the body of the rule and then derives the head;
-   \item $\mz \Gamma; \Delta \rightarrow A$ verifies that $\Delta$ satisfies the term $A$;
-   \item $\dz \Gamma; \Delta; \Xi; \Gamma_1; \Delta_1, \Omega \rightarrow \Xi'; \Delta'; \Gamma'$ instantiates the ordered head terms $\Omega$ and adds them to $\Delta_1$ and $\Gamma_1$.
-   (the contexts for new persistent and linear facts);
+   \item $\az \Gamma; \Delta; R \rightarrow \Xi'; \Delta'; \Gamma'$ picks a subset of linear facts from $\Delta$ and matches the body of the rule $R$ and then derives the head;
+   \item $\mz \Gamma; \Delta \rightarrow A$ verifies that $\Delta$ proves $A$ directly;
+   \item $\dz \Gamma; \Delta; \Xi; \Gamma_1; \Delta_1, \Omega \rightarrow \Xi'; \Delta'; \Gamma'$ deconstructs and instantiates the ordered head terms $\Omega$ and adds them to $\Delta_1$ and $\Gamma_1$, the contexts for new linear and persistent facts, respectively.
 \end{enumerate}
 
-We note that the HLD semantics do not take distribution into account, since we assume that the database is global. We also omit the quantifiers and do not deal with unification
-since it complicates the formal system. The low level dynamic semantics (LLD) shown in \ref{low_level_semantics} improve upon HLD by adding rule priorities, by removing the non-determinism
-when matching the body of rules by modeling all the steps and by applying comprehensions or aggregates as many times as the database allows.
-LLD is closely related to our virtual machine, thus it is a good specification of our implementation.
+Comprehensions are derived by non-deterministically deciding to apply the comprehension ($\dz \with L$ and $\dz \with R$)
+and then using the $\mz$judgment in the rule $\dz comp$. We note that the HLD semantics do not take distribution into account,
+since we assume that the database is global. We also omit the quantifiers and do not deal with unification since it complicates the formal system.
 
-In LLD we try all the rules in order. For each rule, we use a \emph{continuation stack} to store the \emph{continuation frames} created by each fact template $p$ present
-in the body of the rule. Each frame considers all the facts relevant to the template given the current variable bindings ($\mo$rules), that may or not fail during the
-remaining matching process.
-If we fail, we backtrack to try other alternatives
-(through $\cont$rules). If the continuation stack becomes empty, we backtrack to try the
-next rule (rule $\cont next \; rule$). When we succeed the facts consumed
-are known ($\mo end$).
+The low level dynamic semantics (LLD) shown in \ref{low_level_semantics} improve upon HLD by adding rule priorities, by removing non-determinism
+when matching the body of rules by modeling all the matching steps and by applying comprehensions or aggregates as many times as the database allows.
 
-The derivation process in LLD is similar to the one used in HDL, except for the case of comprehensions
-or aggregates. For such cases ($\done comp$), we need to create a continuation stack and start matching
-the body of the construct as we did before.
-When we match the body ($\mc$judgment), we fully derive the head ($\dc$judgment) and then we reuse
-the continuation stack to find which other combinations of the
-database facts can be consumed ($\dc end$). By definition, the continuation stack contains
+In LLD we try all the rules in order. For each rule, we use a \emph{continuation stack} to store the \emph{continuation frames} created by
+each fact template $p$ present
+in the body of the rule. Each frame considers all the facts relevant to the template given the current variable bindings ($\mo$rules), that
+may or not fail during the remaining matching process. If we fail, we backtrack to try other alternatives (through $\cont$rules). If the
+continuation stack becomes empty, we backtrack to try the next rule (rule $\cont next \; rule$). When we succeed the facts consumed are known
+($\mo end$).
+
+The derivation process in LLD is similar to the one used in HDL, except for the case of comprehensions or aggregates. For such cases
+($\done comp$), we need to create a continuation stack and start matching the body of the construct as we did before.
+When we match the body ($\mc$judgment), we fully derive the head ($\dc$judgment) and then we reuse the continuation stack to find which
+other combinations of the database facts can be consumed ($\dc end$). By definition, the continuation stack contains
 enough information to go through all combinations in the database.
 
 However, in order to reuse the stack, we need to \emph{fix} it by removing all the frames pushed after the first continuation frame
