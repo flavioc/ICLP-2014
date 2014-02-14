@@ -225,8 +225,8 @@ be proven since LLD lacks the non-determinism inherent in HLD.
 
 We prove that matching the body of a rule in LLD can also be performed in HLD (matching soundness) and that deriving the head of the rule is also sound (derivation soundness). The matching soundness uses induction on the size of the continuation frames, the size of the continuation stack and the size of terms to match to reconstitute a particular matching tree in HLD.
 
-The derivation soundness lemma is trivial except for the case of comprehensions and aggregates. For such cases we use the matching soundness lemma applied $n$ times (for maximality) and then rebuild the derivation tree in HLD using $2 n$ matching and derivation judgments. These can be retrieved by applying
-induction on size of the continuation stack and continuation frames.\footnote{Details can be
+The derivation soundness lemma is trivial except for the case of comprehensions and aggregates. For such cases we use a modified version of the matching soundness theorem applied to the comprehension's body. It gives us $n$ $\mz$and $n$ $\dz$proofs (for maximality) that are used to rebuild the full derivation proof in HLD. This theorem is proved by
+induction on the size of the continuation stack and continuation frames and uses lemmas that prove the correctness of the continuation stack after each application.\footnote{Details can be
 found in \url{https://github.com/flavioc/formal-meld/blob/master/doc.pdf?raw=true}.}
 
 \begin{comment}
