@@ -3,13 +3,12 @@ execute independently. Node computation happens non-deterministically since any 
 contains enough facts to fire a derivation rule. Facts coming from other nodes will arrive in order of derivation but may be considered
 partially and there is no particular order among the neighborhood.
 
-LM programs can then be made concurrent by simply processing many nodes concurrently. In practice this can be done in many ways.
-Given P processing units and N nodes, we place the N nodes in a work queue and then each processing unit performs work by taking
-one node from the queue and then placing it back at the end of the queue. This trivial technique works but there is no consideration
-for node connections and data locality. An improved technique is to partition the graph of N nodes into P subgraphs and then each
-processing unit will only perform work on its subgraph.
+LM programs can then be made concurrent by simply processing many nodes concurrently. In practice this can be done in many ways, for instance,
+given P processing units and N nodes, we could place the nodes in a work queue and then each processing unit would take
+a node from the queue, process it, and then place it back at the end of the queue. This trivial technique works but there is no consideration
+for node connections and data locality. Our implementation partitions the graph of N nodes into P subgraphs and then each
+processing unit will work on its subgraph.
+For improved load balancing we use node stealing during starvation.
 
-In our implementation for multicores we also partition the graph among P threads but we also use node stealing when threads start to starve
-in order to improve load balancing.
 Our results show that LM programs running on multicores have good scalability. The implementation of the compiler and virtual machine and
 the analysis of experimental results will be presented in a future paper.

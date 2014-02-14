@@ -1,7 +1,7 @@
 
-\newcommand{\selector}[0]{[\; \m{sop} \Rightarrow y; \; BE \;] \lolli HE}
+\newcommand{\selector}[0]{[\; S \Rightarrow y; \; BE \;] \lolli HE}
 \newcommand{\comprehension}[0]{\{ \; \widehat{x}; \; BE; \; HE \; \}}
-\newcommand{\aggregate}[0]{[\;\m{aop} \Rightarrow y; \; \widehat{x}; \; BE; \; HE_1; \; HE_2 \;]}
+\newcommand{\aggregate}[0]{[\; A \Rightarrow y; \; \widehat{x}; \; BE; \; HE_1; \; HE_2 \;]}
 
 Table~\ref{tbl:ast} shows the abstract syntax for rules in LM.
 An LM program $Prog$ consists of a set of derivation rules $\Sigma$ and a database $D$.
@@ -35,7 +35,7 @@ the form $\selector$ (explained later).
 \caption{Abstract syntax of LM.}\label{tbl:ast}
 \end{table}
 
-The body of the rule $BE$ may contain linear ($L$) and persistent ($P$) \emph{fact expressions} and
+The body of the rule, $BE$, may contain linear ($L$) and persistent ($P$) \emph{fact expressions} and
 constraints ($C$). We can chain those elements by using $BE, BE$ or introduce body variables using $\exists_{x}. BE$.
 Alternatively we can use an empty body by using $1$, which creates an axiom.
 
@@ -54,8 +54,8 @@ non-deterministically. While our system uses an implementation dependent order f
 efficiency reasons, sometimes it is important to sort facts by one of the arguments
 because linearity imposes commitment during rule derivation. The abstract syntax for
 this construct is $\selector$, where
-$\m{sop}$ is the selection operation and $y$ is the variable in the body $BE$ that
-represents the value to be selected according to $\m{sop}$.
+$S$ is the selection operation and $y$ is the variable in the body $BE$ that
+represents the value to be selected according to $S$.
 An example using concrete syntax is as follows:
 
 \begin{Verbatim}
@@ -92,9 +92,9 @@ Here, we match \texttt{!edge(A, B)} using all the combinations available in the 
 
 Another useful feature in logic programs is the ability to reduce several facts into a single fact.
 In LM we have aggregates ($AE$), a special kind of sub-rule similar to comprehensions.
-In the abstract syntax $\aggregate$, $\m{aop}$ is the aggregate operation, $\widehat{x}$ is the list of variables
+In the abstract syntax $\aggregate$, $A$ is the aggregate operation, $\widehat{x}$ is the list of variables
 introduced in $BE$, $HE_1$ and $HE_2$ and $y$ is the variable in the body
-$BE$ that represents the values to be aggregated using $\m{aop}$.
+$BE$ that represents the values to be aggregated using $A$.
 We use $\widehat{x}$ to try all the combinations of $BE$, but, in addition to deriving $HE_1$ for each combination,
 we aggregate the values represented by $y$ and derive $HE_2$ only once using $y$.
 
@@ -108,5 +108,5 @@ count-prices(A) -o [:sum => P | . | price(A, P) | 1 | total(A, P)].
 
 By applying the rule, we consume \texttt{count-prices(@1)} and
 derive the aggregate which consumes all the \texttt{price(@1, P)} facts.
-These are added and \texttt{total(@1,~12)} is derived since \texttt{P~=~12}.
+These are added and \texttt{total(@1,~12)} is derived.
 LM provides several aggregate operations, including the minimum, maximum, sum, and count.

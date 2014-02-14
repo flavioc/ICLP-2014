@@ -56,10 +56,10 @@ Table~\ref{table:linear} relates the linear logic directives with the LM syntax.
 
 
 For definitions, we took inspiration from Baelde's work on least and greatest fixed points in linear logic~\cite{Baelde:2012:LGF:2071368.2071370}. Baelde's system goes beyond
-simple recursive definitions and allows proofs using induction and co-induction in linear logic. Fortunately, the proof system satisfies cut-elimination which
-makes it consistent.
+simple recursive definitions and allows proofs using induction and co-induction in linear logic. Fortunately, the proof system satisfies
+cut-elimination~\cite{Baelde:2012:LGF:2071368.2071370} which makes it consistent.
 
-In a comprehension, we want to apply an implication as many matches as the database allows. One way to formally describe comprehensions would be to use persistent
+In a comprehension, we want to apply an implication to as many matches as the database allows. One way to formally describe comprehensions would be to use persistent
 rules that would be used a few times and then would be forgotten. A more reasonable approach is to use
 definitions. Given a comprehension $C = \{ \; \widehat{x}; \; A; \; B \; \}$ with a body $A$ and a head $B$, then we can build the following recursive definition:
 
@@ -72,7 +72,7 @@ to apply the comprehension once. Because we also get another $\compr{C}$ by sele
 the comprehension can be applied again, recursively.
 
 This form of definition does not capture the desired \emph{maximality} aspect of the comprehension,
-since it commits to find a particular form of proof and not all possible proofs. The low level
+since it commits to finding a particular form of proof and not all possible proofs. The low level
 operational semantics will ensure maximality.
 
 Aggregates work identically, but they need an extra argument to accumulate the aggregated value. If a sum aggregate $C$ has the form $[\;\m{sum} \Rightarrow y; \; \widehat{x}; \; A; \; B_1; \; B_2 \;]$, then the definition will be as follows (the aggregate is initiated as $\compr{C} \; 0$):

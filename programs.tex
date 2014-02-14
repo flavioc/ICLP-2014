@@ -9,7 +9,7 @@ We use an \texttt{edge}
 predicate to represent directed edges between nodes and their corresponding weights. To represent the shortest
 distance to a node \texttt{startnode} we have a \texttt{path(A, B, F)} where \texttt{B} is the distance to \texttt{startnode}
 and \texttt{F} is a flag to indicate if such distance has been propagated to the neighbors. Since the distance from
-the \texttt{startnode} to itself is \texttt{0}, we start with the axiom \texttt{path(startnode, 0, notused)} to start the program.
+the \texttt{startnode} to itself is \texttt{0}, we start with the axiom \texttt{path(startnode, 0, notused)} to start the algorithm.
 
 The first rule avoids propagating paths with the same distance and the second rule eliminates paths where the distance
 is already larger than some other distance. Finally, the third rule, marks the path as \texttt{used} and propagates
