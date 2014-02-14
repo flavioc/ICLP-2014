@@ -73,7 +73,7 @@ to match them. Other operations available are \texttt{max} and \texttt{random} (
 \paragraph{Exists Expression}
 
 Exists expressions ($EE$) are based on the linear logic term of the same name and are used to create new node addresses.
-We can use the new address to instantiate new facts for this node.  
+We can then use the new address to instantiate new facts for this node.  
 The following example illustrates the use of the exists expression, where we derive
 \texttt{perform-work} at a new node \texttt{B}.
 
@@ -91,8 +91,9 @@ sub-rules that are applied with all possible combinations of facts from the data
 The body $BE$ is used to generate all possible combinations for the head $SH$, according to the facts
 in the database. Note that $BE$ is also locally restricted.
 
-We have already seen an example of comprehensions in the visit program (Fig.~\ref{code:visit} line 8).
-Here, we match \texttt{!edge(A, B)} using all the combinations available in the database and for each combination we derive \texttt{visit(B)}.
+We have already seen an example of comprehensions in the visit program (Fig.~\ref{code:visit} line 7).
+Here, we match \texttt{!edge(A, B)} using all the combinations available in the database and derive \texttt{visit(B)}
+for each combination.
 
 \paragraph{Aggregates}
 

@@ -50,7 +50,7 @@ As the name indicates, the pagerank is computed for a certain number of iteratio
 initialized in the first rule (lines 15-16) along with an accumulator.
 
 The second rule of the program (lines 18-22) propagates a newly computed pagerank value to all neighbors. Each node will then accumulate
-the pagerank values that are sent to them through the fourth rule (lines 30-32) and it will immediately add all the other incoming values
+the pagerank values that are sent to them through the fourth rule (lines 30-32) and it will immediately add other currently available values
 through the use of the aggregate. When we have accumulated all the values we need, the third rule (lines 24-28) is fired and a new pagerank value is derived.
 
 We also have an asynchronous version of the algorithm that trades correctness with convergence speed since it does not synchronize between iterations.

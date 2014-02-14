@@ -83,7 +83,7 @@ Aggregates work identically, but they need an extra argument to accumulate the a
 
 \subsection{Dynamic Semantics}
 
-The high level dynamic semantics (HLD) formalize the mechanism of matching rules and deriving new facts and is closely related to the fragment presented above.
+The high level dynamic semantics (HLD) formalize the mechanism of matching and deriving a single rule. It is closely related to the fragment presented above.
 From the sequent calculus, we consider $\Gamma$ and $\Delta$ the database of persistent and linear facts, respectively.
 We consider the rules of the program as persistent linear implications of the form $\bang (A \lolli B)$ that we put in a separate context $\Phi$.
 We ignore the right hand side $C$ of the calculus and use inversion on the $\Delta$ and $\Gamma$ contexts so that we only have atomic terms (facts). To apply rules

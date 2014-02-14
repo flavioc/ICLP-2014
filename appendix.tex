@@ -177,7 +177,7 @@ All the judgments in this system share a few arguments, namely:
 
 \begin{itemize}
    \item[$\Gamma$]: Set of persistent facts.
-   \item[$\Xi'$]: Multi-set of facts consumed during the whole process (output).
+   \item[$\Xi'$]: Multi-set of facts consumed after applying one rule (output).
    \item[$\Delta'$]: Multi-set of linear facts derived after applying one rule (output).
    \item[$\Gamma'$]: Set of persistent facts derived after applying one rule (output).
 \end{itemize}
@@ -198,10 +198,40 @@ The whole process is started by the $\doo$and $\ao$judgments. The $\doo \Gamma; 
 {\ao \Gamma; \Delta; R; (\Phi, \Delta) \rightarrow \Xi';\Delta';\Gamma'}
 \]
 
+\subsection{Continuation Frames}
+
+Continuation frames are used for backtracking in the matching process.
+
+\subsubsection{Persistent Frame}
+
+A persistent frame has the form $[\Gamma'; \Delta; \Xi; \bang p; \Omega; \Lambda; \Upsilon]$, where:
+
+\begin{enumerate}
+   \item[$\Delta$]: Remaining multi-set of linear facts.
+   \item[$\Xi$]: Multi-set of linear resources we have consumed to reach this point.
+   \item[$\bang p$]: Current fact expression that originated this choice point.
+   \item[$\Omega$]: Remaining terms we need to match past this choice point. This is an ordered list.
+   \item[$\Lambda$]: Multi-set of linear fact expressions that we have matched to reach this choice point. All the linear facts that match these terms are located in $\Xi$.
+   \item[$\Upsilon$]: Multi-set of persistent fact expressions that we matched up to this point.
+\end{enumerate}
+
+\subsubsection{Linear Frame}
+
+A linear frame has the form $(\Delta; \Delta'; \Xi; p; \Omega; \Lambda, \Upsilon)$, where:
+
+\begin{enumerate}
+   \item[$\Delta$]: Multi-set of linear resources that are not of type $p$ plus all the other $p$'s we have already tried, including the current $p$.
+   \item[$\Delta'$]: All the other $p$'s we haven't tried yet. It is a multi-set of linear resources.
+   \item[$\Xi$]: Multi-set of linear resources we have consumed to reach this point.
+   \item[$p$]: Current fact expression that originated this choice point.
+   \item[$\Omega$]: Remaining terms we need to match past this choice point. This is an ordered list.
+   \item[$\Lambda$]: Multi-set of linear fact expressions that we have matched to reach this choice point. All the linear facts that match these terms are located in $\Xi$.
+   \item[$\Upsilon$]: Multi-set of persistent fact expressions that we matched up to this point.
+\end{enumerate}
 
 \subsection{Match}
 
-The matching judgment uses the form $\mo \Gamma; \Delta; \Xi; \Omega; H; C; R \rightarrow \Xi'; \Delta'; \Gamma'$:
+The matching judgment uses the form $\mo \Gamma; \Delta; \Xi; \Omega; H; C; R \rightarrow \Xi'; \Delta'; \Gamma'$ where:
 
 \begin{enumerate}
    \item[$\Delta$]: Multi-set of linear facts still available to complete the matching process.
@@ -213,7 +243,7 @@ The matching judgment uses the form $\mo \Gamma; \Delta; \Xi; \Omega; H; C; R \r
 \end{enumerate}
 
 Matching will attempt to use facts from $\Delta$ and $\Gamma$ to match the terms of the body of the rule represented as $\Omega$. During this process continuation frames are pushed into $C$.
-If the matching process fails, we use the continuation stack through the $\cont$judgment. Note that we use different continuation frames for persistent and linear facts.
+If the matching process fails, we use the continuation stack through the $\cont$judgment.
 
 {\footnotesize
 \[
@@ -281,7 +311,7 @@ If the matching process fails, we use the continuation stack through the $\cont$
 
 \subsection{Continuation}
 
-If the previous matching process fails, we pick the top frame from the stack $C$ and restore the matching process using another fact and/or context. The continuation judgment $\cont C; P; H; R; \Gamma; \Xi'; \Delta'; \Gamma'$ deals with the backtracking process where the meaning of each argument is as follows:
+If the previous matching process fails, we pick the top frame from the stack $C$ and restore the matching process using another fact and/or context. The continuation judgment $\cont C; H; R; \Gamma; \Xi'; \Delta'; \Gamma'$ deals with the backtracking process where the meaning of each argument is as follows:
 
 \begin{enumerate}
    \item[$C$]: Continuation stack.
@@ -468,7 +498,7 @@ $\mc \Gamma; \Delta; \Xi_N; \Gamma_{N1}; \Delta_{N1}; \Xi; \Omega; C; P; AB; \Om
 
 \subsection{Match Comprehension Continuation}
 
-If the matching process fails, we need to backtrack to the previous frame and restore the matching process at that point. The judgment that backtracks has the form $\contc \Gamma; \Delta_N; \Xi_N; \Delta_{N1}; C; AB; \Omega_N \rightarrow \Xi'; \Delta'; \Gamma'$:
+If the matching process fails, we need to backtrack to the previous frame and restore the matching process at that point. The judgment that backtracks has the form $\contc \Gamma; \Delta_N; \Xi_N; \Delta_{N1}; C; P; AB; \Omega_N \rightarrow \Xi'; \Delta'; \Gamma'$:
 
 \begin{enumerate}
    \item[$\Delta_N$]: Multi-set of linear facts that were still available after matching the body of the rule.
@@ -526,7 +556,7 @@ If the matching process fails, we need to backtrack to the previous frame and re
 
 \subsection{Stack Transformation}
 
-After a comprehension is matched and before we derive the head of such comprehension, we need to "fix" the continuation stack. In a nutshell, we remove all the frames except the first frame and remove the consumed linear facts from the remaining frames so that they are still valid for the next application of the comprehension.
+After a comprehension is matched and before we derive the head of such comprehension, we need to "fix" the continuation stack. In a nutshell, we remove all the frames except the first linear frame and remove the consumed linear facts from the remaining frames so that they are still valid for the next application of the comprehension.
 The judgment that fixes the stack has the form $\dall \Gamma; \Xi_N; \Gamma_{N1}; \Delta_{N1}; \Xi; C; P; AB; \Omega_N; \Delta_N \rightarrow \Xi'; \Delta'; \Gamma'$:
 
 \begin{enumerate}
@@ -534,7 +564,7 @@ The judgment that fixes the stack has the form $\dall \Gamma; \Xi_N; \Gamma_{N1}
    \item[$\Gamma_{N1}$]: Set of persistent facts derived by the head of the rule.
    \item[$\Delta_{N1}$]: Multi-set of linear facts derived by the head of the rule.
    \item[$\Xi$]: Multi-set of linear facts consumed by the previous application of the comprehension.
-   \item[$C$]: Continuation stack for the comprehension.
+   \item[$C, P$]: Continuation stacks for the comprehension.
    \item[$AB$]: Comprehension $\comp A \lolli B$ that is being matched.
    \item[$\Omega_N$]: Ordered list of remaining terms of the head of the rule to be derived.
    \item[$\Delta_N$]: Multi-set of linear facts that were still available after matching the body of the rule.

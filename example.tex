@@ -18,7 +18,6 @@ The first argument of every predicate must be typed as a \emph{node}.
 For concurrency and data partitioning purposes, derivation rules are constrained by the expressions that can be written in the body.
 The body of every rule can only refer to facts in the same node.
 However, the expressions in the head may refer to other nodes, as long as those nodes are instantiated in the body of the rule.
-The database of the program can then be partitioned by the first argument of each fact.
 
 Each rule in LM has a defined priority that is inferred from its position in the source file.
 Rules at the beginning of the file have higher priority. At the node level, we consider all
@@ -28,8 +27,7 @@ The set of candidate rules is then applied (by priority) and updated as new fact
 Our first program example is shown in Fig.~\ref{code:message}. This is a message routing program
 that simulates message transmission through a network of nodes.
 We first declare all the predicates (lines 1-2), which represent the different facts we are going to
-use. The first argument of every predicate must be typed as a \texttt{node}, which represents the location of the fact in
-the graph data structure.
+use.
 Predicate \texttt{edge/2} is a non \texttt{linear} (persistent) predicate and \texttt{message/3} is linear. While linear facts may be retracted, persistent facts are always
 true once they are derived.
 
