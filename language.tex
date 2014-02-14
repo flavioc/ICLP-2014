@@ -1,7 +1,7 @@
 
 \newcommand{\selector}[0]{[\; S \Rightarrow y; \; BE \;] \lolli HE}
-\newcommand{\comprehension}[0]{\{ \; \widehat{x}; \; BE; \; HE \; \}}
-\newcommand{\aggregate}[0]{[\; A \Rightarrow y; \; \widehat{x}; \; BE; \; HE_1; \; HE_2 \;]}
+\newcommand{\comprehension}[0]{\{ \; \widehat{x}; \; BE; \; SH \; \}}
+\newcommand{\aggregate}[0]{[\; A \Rightarrow y; \; \widehat{x}; \; BE; \; SH_1; \; SH_2 \;]}
 
 Table~\ref{tbl:ast} shows the abstract syntax for rules in LM.
 An LM program $Prog$ consists of a set of derivation rules $\Sigma$ and a database $D$.
@@ -25,7 +25,9 @@ the form $\selector$ (explained later).
   Persistent Facts & $P$ & $::=$ & $\bang p(\hat{x})$\\
   Constraints & $C$ & $::=$ & $c(\hat{x})$ \\
   
-  Exists constructs & $EE$ & $::=$ & $\exists_{\widehat{x}}. HE$ \\
+  Sub-Head Expressions & $SH$ & $::=$ & $L \; | \; P \; | \; C \; | \; SH, SH \; | \; 1$\\
+  
+  Exists constructs & $EE$ & $::=$ & $\exists_{\widehat{x}}. SH$ \\
   Comprehensions & $CE$ & $::=$ & $\comprehension$ \\
   Aggregates & $AE$ & $::=$ & $\aggregate$ \\
   
@@ -81,8 +83,8 @@ do-work(A, W) -o exists B. (perform-work(B, W)).
 
 Sometimes we need to consume a linear fact and then immediately generate several facts depending on
 the contents of the database. To solve this particular need, we created the concept of comprehensions, which are
-sub-rules that are applied with all possible combinations of facts from the database. In a comprehension $\comprehension$, $\widehat{x}$ is a list of variables, $BE$ is the body of the comprehension and $HE$ is the head.
-The body $BE$ is used to generate all possible combinations for the head $HE$, according to the facts
+sub-rules that are applied with all possible combinations of facts from the database. In a comprehension $\comprehension$, $\widehat{x}$ is a list of variables, $BE$ is the comprehension's body and $SH$ is the head.
+The body $BE$ is used to generate all possible combinations for the head $SH$, according to the facts
 in the database. Note that this body is also locally restricted, just like the body of a rule. 
 
 We have already seen an example of comprehensions in the visit program (Fig.~\ref{code:visit} line 8).
@@ -93,10 +95,10 @@ Here, we match \texttt{!edge(A, B)} using all the combinations available in the 
 Another useful feature in logic programs is the ability to reduce several facts into a single fact.
 In LM we have aggregates ($AE$), a special kind of sub-rule similar to comprehensions.
 In the abstract syntax $\aggregate$, $A$ is the aggregate operation, $\widehat{x}$ is the list of variables
-introduced in $BE$, $HE_1$ and $HE_2$ and $y$ is the variable in the body
+introduced in $BE$, $SH_1$ and $SH_2$ and $y$ is the variable in the body
 $BE$ that represents the values to be aggregated using $A$.
-We use $\widehat{x}$ to try all the combinations of $BE$, but, in addition to deriving $HE_1$ for each combination,
-we aggregate the values represented by $y$ and derive $HE_2$ only once using $y$.
+We use $\widehat{x}$ to try all the combinations of $BE$, but, in addition to deriving $SH_1$ for each combination,
+we aggregate the values represented by $y$ and derive $SH_2$ only once using $y$.
 
 Let's consider a database with the following facts and a rule:
 
