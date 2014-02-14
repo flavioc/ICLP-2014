@@ -201,7 +201,7 @@ continuation stack becomes empty, we backtrack to try the next rule (rule $\cont
 ($\mo end$).
 
 The derivation process in LLD is similar to the one used in HDL, except for the case of comprehensions or aggregates. For such cases
-($\done comp$), we need to create a continuation stack and start matching the body of the construct as we did before.
+($\done comp$), we need to create a continuation stack and start matching the body of the expression as we did before.
 When we match the body ($\mc$judgment), we fully derive the head ($\dc$judgment) and then we reuse the continuation stack to find which
 other combinations of the database facts can be consumed ($\dc end$). By definition, the continuation stack contains
 enough information to go through all combinations in the database.
@@ -268,7 +268,7 @@ is also sound. This lemma is as follows:
    If $\done \Gamma; \Delta; \Xi; \Gamma_1; \Delta_1; \Omega \rightarrow \Xi'; \Delta'; \Gamma'$ then $\dz \Gamma; \Delta; \Gamma_1; \Delta_1; \Omega \rightarrow \Xi'; \Delta'; \Gamma'$.
 \end{lemma}
 \begin{proof}
-   Straightforward use of induction on $\Omega$ (the terms of the head) except for the sub-case of comprehensions and aggregates, where we need to use the comprehension and aggregate theorems to construct the derivation tree using $n$ applications of the corresponding construct.
+   Straightforward use of induction on $\Omega$ (the terms of the head) except for the sub-case of comprehensions and aggregates, where we need to use the comprehension and aggregate theorems to construct the derivation tree using $n$ applications of the corresponding expression.
 \end{proof}
 
 In the case of proving the soundness of comprehensions, we use a very identical theorem to the one used
