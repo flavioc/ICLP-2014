@@ -1,7 +1,5 @@
 
-\section{Programs}
-
-\subsection{N-Queens program}\label{code:nqueens}
+\section{N-Queens program}\label{code:nqueens}
 
 \begin{figure}[h!]
 \scriptsize\begin{Verbatim}[numbers=left]
@@ -217,6 +215,7 @@ The matching judgment uses the form $\mo \Gamma; \Delta; \Xi; \Omega; H; C; R \r
 Matching will attempt to use facts from $\Delta$ and $\Gamma$ to match the terms of the body of the rule represented as $\Omega$. During this process continuation frames are pushed into $C$.
 If the matching process fails, we use the continuation stack through the $\cont$judgment. Note that we use different continuation frames for persistent and linear facts.
 
+{\footnotesize
 \[
 \infer[\mo p \; ok \; first]
 {\mo \Gamma ; \Delta, p_1, \Delta'' ; \Xi; p, \Omega; H; C; R \rightarrow \Xi'; \Delta'; \Gamma'}
@@ -278,6 +277,7 @@ If the matching process fails, we use the continuation stack through the $\cont$
 {\mo \Gamma ; \Delta; \Xi; \cdot ; H; C; R \rightarrow \Xi'; \Delta'; \Gamma'}
 {\done \Gamma ; \Delta; \Xi; \cdot ; H; \cdot \rightarrow \Xi'; \Delta'; \Gamma'}
 \]
+}
 
 \subsection{Continuation}
 
@@ -289,6 +289,7 @@ If the previous matching process fails, we pick the top frame from the stack $C$
    \item[$R$]: Next available rules if the current one does not match.
 \end{enumerate}
 
+{\footnotesize
 \[
 \infer[\cont next \; rule]
 {\cont \cdot; H; (\Phi, \Delta); \Gamma ; \Xi'; \Delta'; \Gamma'}
@@ -318,6 +319,7 @@ If the previous matching process fails, we pick the top frame from the stack $C$
 {\cont [\cdot; \Delta; \bang p, \Omega; \Xi; \Lambda; \Upsilon], C; H; R; \Gamma; \Xi'; \Delta'; \Gamma'}
 {\cont C; H; R; \Gamma; \Xi'; \Delta'; \Gamma'}
 \]
+}
 
 \subsection{Derivation}
 
@@ -332,6 +334,7 @@ The derivation judgment uses the form $\done \Gamma; \Delta; \Xi; \Gamma_1; \Del
    \item[$\Omega$]: Remaining terms to derive as an ordered list. We start with $B$ if the original rule is $A \lolli B$.
 \end{enumerate}
 
+{\footnotesize
 \[
 \infer[\done p]
 {\done \Gamma ; \Delta; \Xi; \Gamma_1 ; \Delta_1; p, \Omega \rightarrow \Xi'; \Delta'; \Gamma'}
@@ -365,6 +368,7 @@ The derivation judgment uses the form $\done \Gamma; \Delta; \Xi; \Gamma_1; \Del
 {\done \Gamma; \Delta ; \Xi; \Gamma_1; \Delta_1; \comp A \lolli B, \Omega \rightarrow \Xi';\Delta';\Gamma'}
 {\mc \Gamma; \Delta; \Xi; \Gamma_1; \Delta_1; \cdot; A ; B ; \cdot; \cdot; \comp A \lolli B; \Omega; \Delta \rightarrow \Xi';\Delta';\Gamma'}
 \]
+}
 
 \subsection{Match Comprehension}
 
@@ -388,7 +392,7 @@ $\mc \Gamma; \Delta; \Xi_N; \Gamma_{N1}; \Delta_{N1}; \Xi; \Omega; C; P; AB; \Om
    \item[$\Delta_N$]: Multi-set of linear facts that were still available after matching the body of the rule. Note that $\Delta, \Xi = \Delta_N$.
 \end{enumerate}
 
-\scriptsize
+{\scriptsize
 
 \[
 \infer[\mc p \; ok \; first]
@@ -460,8 +464,7 @@ $\mc \Gamma; \Delta; \Xi_N; \Gamma_{N1}; \Delta_{N1}; \Xi; \Omega; C; P; AB; \Om
 {\mc \Gamma; \Delta; \Xi_N; \Gamma_{N1}; \Delta_{N1}; \Xi; \cdot; C; P; \comp A \lolli B; \Omega_N; \Delta_N \rightarrow \Xi'; \Delta'; \Gamma'}
 {\dall \Gamma; \Xi_N; \Gamma_{N1}; \Delta_{N1}; \Xi; C; P; \comp A \lolli B; \Omega_N; \Delta_N \rightarrow \Xi'; \Delta'; \Gamma'}
 \]
-
-\footnotesize
+}
 
 \subsection{Match Comprehension Continuation}
 
@@ -477,6 +480,7 @@ If the matching process fails, we need to backtrack to the previous frame and re
    \item[$\Omega_N$]: Ordered list of remaining terms of the head of the rule to be derived.
 \end{enumerate}
 
+{\scriptsize
 \[
 \infer[\contc end]
 {\contc \Gamma; \Delta_N; \Xi_N; \Gamma_{N1}; \Delta_{N1}; \cdot; \cdot; \comp A \lolli B; \Omega \rightarrow \Xi'; \Delta'; \Gamma'}
@@ -518,6 +522,7 @@ If the matching process fails, we need to backtrack to the previous frame and re
 {\contc \Gamma; \Delta_N; \Xi_N; \Gamma_{N1}; \Delta_{N1}; \cdot; [\cdot; \Delta_N; \cdot; \bang p; \Omega; \cdot; \Upsilon], P; AB; \Omega_N \rightarrow \Xi'; \Delta'; \Gamma'}
 {\contc \Gamma; \Delta_N; \Xi_N; \Gamma_{N1}; \Delta_{N1}; \cdot; P; AB; \Omega_N \rightarrow \Xi'; \Delta'; \Gamma'}
 \]
+}
 
 \subsection{Stack Transformation}
 
@@ -535,6 +540,7 @@ The judgment that fixes the stack has the form $\dall \Gamma; \Xi_N; \Gamma_{N1}
    \item[$\Delta_N$]: Multi-set of linear facts that were still available after matching the body of the rule.
 \end{enumerate}
 
+{\footnotesize
 \[
 \infer[\strans]
 {\strans \Xi; [\Gamma'; \Delta_N; \cdot; \bang p; \Omega; \cdot; \Upsilon], P; [\Gamma'; \Delta_N - \Xi; \cdot; \bang p, \Omega; \cdot; \Upsilon], P'}
@@ -565,6 +571,7 @@ The judgment that fixes the stack has the form $\dall \Gamma; \Xi_N; \Gamma_{N1}
 {\dall \Gamma; \Xi_N; \Gamma_{N1}; \Delta_{N1}; \Xi; \_, X, C; P; \comp A \lolli B; \Omega_N; \Delta_N \rightarrow \Xi'; \Delta'; \Gamma'}
 {\dall \Gamma; \Xi_N; \Gamma_{N1}; \Delta_{N1}; \Xi; X, C; P; \comp A \lolli B; \Omega_N; \Delta_N \rightarrow \Xi'; \Delta'; \Gamma'}
 \]
+}
 
 \subsection{Comprehension Derivation}
 
@@ -581,6 +588,7 @@ After the fixing process, we start deriving the head of the comprehension. All t
    \item[$\Delta_N$]: Multi-set of remaining linear facts that can be used for the next comprehension applications.
 \end{enumerate}
 
+{\footnotesize
 \[
 \infer[\dc p]
 {\dc \Gamma; \Xi; \Gamma_1; \Delta_1; p, \Omega; C; P; \comp A \lolli B; \Omega_N; \Delta_N \rightarrow \Xi'; \Delta'; \Gamma'}
@@ -604,6 +612,7 @@ After the fixing process, we start deriving the head of the comprehension. All t
 {\dc \Gamma; \Xi; \Gamma_1; \Delta_1; \cdot; C; P; \comp A \lolli B; \Omega_N; \Delta_N \rightarrow \Xi'; \Delta'; \Gamma'}
 {\contc \Gamma; \Delta_N; \Xi; \Gamma_1; \Delta_1; C; P; \comp A \lolli B; \Omega_N \rightarrow \Xi'; \Delta'; \Gamma'}
 \]
+}
 
 \begin{comment}
 \section{Main Matching Soundness Theorem}\label{main_soundness_theorem}

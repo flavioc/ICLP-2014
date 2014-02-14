@@ -5,6 +5,7 @@ We now present LM programs in order to illustrate common programming techniques\
 
 Finding the shortest distance between two nodes in a graph is another well known graph problem.
 Fig.~\ref{code:shortest_path} presents the LM code to solve this particular problem.
+
 We use an \texttt{edge}
 predicate to represent directed edges between nodes and their corresponding weights. To represent the shortest
 distance to a node \texttt{startnode} we have a \texttt{path(A, B, F)} where \texttt{B} is the distance to \texttt{startnode}
@@ -73,17 +74,17 @@ start(A).
 start(A), !numInput(A, T)
    -o accumulator(A, 0.0, T, 1), pagerank(A, 1.0 / float(pages), 0).
 
-pagerank(A, V, Id),
+pagerank(A, V, Id), // propagate new pagerank value
 !numLinks(A, C),
 Id < iterations,
 Result = V / float(C)
-	-o {B, W | !output(A, B, W) | newrank(B, A, Result, Id + 1)}.
+   -o {B, W | !output(A, B, W) | newrank(B, A, Result, Id + 1)}.
 
-accumulator(A, Acc, 0, Id),
+accumulator(A, Acc, 0, Id), // new pagerank
 !numInput(A, T),
 V = damping + (1.0 - damping) * Acc,
 Id <= iterations
-	-o pagerank(A, V, Id), accumulator(A, 0.0, T, Id + 1).
+   -o pagerank(A, V, Id), accumulator(A, 0.0, T, Id + 1).
 	
 newrank(A, B, V, Id), accumulator(A, Acc, T, Id), T > 0
    -o [sum => S, count => C | D | newrank(A, D, S, Id) |
@@ -99,7 +100,7 @@ newrank(A, B, V, Id), accumulator(A, Acc, T, Id), T > 0
 The N-Queens~\cite{8queens} puzzle is the problem of placing N chess queens on an NxN chessboard so
 that no pair of two queens attack each other. The specific challenge of finding all the distinct
 solutions to this problem is a good benchmark in designing parallel algorithms. The LM solution is presented
-in Appendix~\ref{code:nqueens}.
+in \ref{code:nqueens}.
 
 First, we consider each cell of the chessboard as a node that can communicate with the adjacent left
 (\texttt{left}) and adjacent right (\texttt{right}) cells and also with the first two non-diagonal cells in the next row
