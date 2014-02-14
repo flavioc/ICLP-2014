@@ -17,19 +17,21 @@ the form $\selector$ (explained later).
   Program & $Prog$ & $::=$ & $\Sigma, D$ \\
   Set Of Rules & $\Sigma$ & $::=$ & $\cdot \; | \; \Sigma, R$\\
   Database & $D$ & $::=$ & $\Gamma; \Delta$ \\
-  Rules & $R$ & $::=$ & $BE \lolli HE \; | \; \forall_{x}. R \; | \; \selector$ \\
-  Body Expressions & $BE$ & $::=$ & $L \; | \; P \; | \; C \; | \; BE, BE \; | \; \exists_{x}. BE \; | \; 1$\\
-  Head Expressions & $HE$ & $::=$ & $L \; | \; P \; | \; HE, HE \; | \; EE \; | \; CE \; | \; AE \; | \; 1$\\
+  Rule & $R$ & $::=$ & $BE \lolli HE \; | \; \forall_{x}. R \; | \; \selector$ \\
+  Body Expression & $BE$ & $::=$ & $L \; | \; P \; | \; C \; | \; BE, BE \; | \; \exists_{x}. BE \; | \; 1$\\
+  Head Expression & $HE$ & $::=$ & $L \; | \; P \; | \; HE, HE \; | \; EE \; | \; CE \; | \; AE \; | \; 1$\\
   
-  Linear Facts & $L$ & $::=$ & $l(\hat{x})$\\
-  Persistent Facts & $P$ & $::=$ & $\bang p(\hat{x})$\\
-  Constraints & $C$ & $::=$ & $c(\hat{x})$ \\
+  Linear Fact & $L$ & $::=$ & $l(\hat{x})$\\
+  Persistent Fact & $P$ & $::=$ & $\bang p(\hat{x})$\\
+  Constraint & $C$ & $::=$ & $c(\hat{x})$ \\
+  Selector Operation & $S$ & $::=$ & $\mathtt{min} \; | \; \mathtt{max} \; | \; \mathtt{random}$\\
   
-  Sub-Head Expressions & $SH$ & $::=$ & $L \; | \; P \; | \; C \; | \; SH, SH \; | \; 1$\\
+  Exists Expression & $EE$ & $::=$ & $\exists_{\widehat{x}}. SH$ \\
+  Comprehension & $CE$ & $::=$ & $\comprehension$ \\
+  Aggregate & $AE$ & $::=$ & $\aggregate$ \\
+  Aggregate Operation & $A$ & $::=$ & $\mathtt{min} \; | \; \mathtt{max} \; | \; \mathtt{sum} \; | \; \mathtt{count}$ \\
   
-  Exists constructs & $EE$ & $::=$ & $\exists_{\widehat{x}}. SH$ \\
-  Comprehensions & $CE$ & $::=$ & $\comprehension$ \\
-  Aggregates & $AE$ & $::=$ & $\aggregate$ \\
+  Sub-Head & $SH$ & $::=$ & $L \; | \; P \; | \; C \; | \; SH, SH \; | \; 1$\\
   
   Known Linear Facts & $\Delta$ & $::=$ & $\cdot \; | \; \Delta, l(\hat{t})$ \\
   Known Persistent Facts & $\Gamma$ & $::=$ & $\cdot \; | \; \Gamma, \bang p(\hat{t})$ \\
@@ -46,7 +48,7 @@ Fact expressions are template facts that instantiate variables
 Constraints are boolean expressions that must
 be true in order for the rule to be fired (for example, \texttt{C~=~A~+~B}). Constraints use variables from fact expressions and are built using a small functional language that includes mathematical operations, boolean operations, external functions and literal values.
 
-The head of a rule ($HE$) contains linear ($L$) and persistent ($P$) \emph{fact templates} which are uninstantiated facts and will derive new facts. The head can also have \emph{exist constructs} ($EE$), \emph{comprehensions} ($CE$) and \emph{aggregates} ($AE$). All those constructs
+The head of a rule ($HE$) contains linear ($L$) and persistent ($P$) \emph{fact templates} which are uninstantiated facts and will derive new facts. The head can also have \emph{exist expressions} ($EE$), \emph{comprehensions} ($CE$) and \emph{aggregates} ($AE$). All those expressions
 may use all the variables instantiated in the body. We can also use an empty head by choosing $1$.
 
 \paragraph{Selectors}
@@ -55,24 +57,23 @@ When a rule body is instantiated using facts from the database, facts are picked
 non-deterministically. While our system uses an implementation dependent order for
 efficiency reasons, sometimes it is important to sort facts by one of the arguments
 because linearity imposes commitment during rule derivation. The abstract syntax for
-this construct is $\selector$, where
-$S$ is the selection operation and $y$ is the variable in the body $BE$ that
-represents the value to be selected according to $S$.
+this expression is $\selector$, where $S$ is the selection operation and $y$ is the
+variable in the body $BE$ that represents the value to be selected according to $S$.
 An example using concrete syntax is as follows:
 
 \begin{Verbatim}
-[:min => W | !edge(A, B), weight(A, B, W)] -o picked(A, B, W).
+[min => W | !edge(A, B), weight(A, B, W)] -o picked(A, B, W).
 \end{Verbatim}
 
 In this case, we order the \texttt{weight} facts by \texttt{W} in ascending order and then try
-to match them. Other operations available are \texttt{:max} and \texttt{:random} (to force no pre-defined order at the
+to match them. Other operations available are \texttt{max} and \texttt{random} (to force no pre-defined order at the
 implementation level).
 
-\paragraph{Exists Constructs}
+\paragraph{Exists Expression}
 
-Exists constructs ($EE$) are based on the linear logic construct of the same name and are used to create new node addresses.
+Exists expressions ($EE$) are based on the linear logic term of the same name and are used to create new node addresses.
 We can use the new address to instantiate new facts for this node.  
-The following example illustrates the use of the exists construct, where we derive
+The following example illustrates the use of the exists expression, where we derive
 \texttt{perform-work} at a new node \texttt{B}.
 
 \begin{Verbatim}
@@ -105,10 +106,10 @@ Let's consider a database with the following facts and a rule:
 \begin{Verbatim}
 price(@1, 3). price(@1, 4). price(@1, 5).
 count-prices(@1).
-count-prices(A) -o [:sum => P | . | price(A, P) | 1 | total(A, P)].
+count-prices(A) -o [sum => P | . | price(A, P) | 1 | total(A, P)].
 \end{Verbatim}
 
 By applying the rule, we consume \texttt{count-prices(@1)} and
 derive the aggregate which consumes all the \texttt{price(@1, P)} facts.
 These are added and \texttt{total(@1,~12)} is derived.
-LM provides several aggregate operations, including the minimum, maximum, sum, and count.
+LM provides aggregate operations such as minimum, maximum, sum, and count.

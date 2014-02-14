@@ -40,14 +40,14 @@ preceded by \texttt{!} for readability.
 
 \begin{figure}[h!]
 \small\begin{Verbatim}[numbers=left]
-type edge(node, node).
-type linear message(node, string, list node).
+type edge(node, node). // define direct edge
+type linear message(node, string, list node). // message format
 
 message(A, Content, [B | L]),
 !edge(A, B)
-   -o message(B, Content, L).
+   -o message(B, Content, L). // message derived at node B
 
-message(A, Content, []) -o 1.
+message(A, Content, []) -o 1. // program ends
 
 !edge(@1, @2). !edge(@2, @3). !edge(@3, @4). !edge(@1, @3).
 message(@1, 'Hello World', [@3, @4]).
@@ -79,10 +79,10 @@ type linear visit(node).
 type linear unvisited(node).
 type linear visited(node).
 
-visit(A), unvisited(A) -o
+visit(A), unvisited(A) -o // mark node as visited and visit neighbors
    visited(A), {B | !edge(A, B) | visit(B)}.
 
-visit(A), visited(A) -o visited(A).
+visit(A), visited(A) -o visited(A). // already visited
 
 !edge(@1, @2). !edge(@2, @3). !edge(@1, @4). !edge(@2, @4).
 unvisited(@1). unvisited(@2). unvisited(@3). unvisited(@4).
