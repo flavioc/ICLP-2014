@@ -9,16 +9,16 @@
 \newcommand{\defeq}{\buildrel\triangle\over =}
 \newcommand{\compr}[1]{\m{def} \; #1}
 
-\newcommand{\mo}{\m{match}_1 \;}
-\newcommand{\cont}{\m{cont} \;}
-\newcommand{\contc}{\m{contc} \;}
-\newcommand{\done}{\m{derive}_1 \;}
-\newcommand{\doo}{\m{run}_1 \;}
-\newcommand{\mc}[0]{\m{match}_c \; }
-\newcommand{\dall}[0]{\m{fix} \; }
-\newcommand{\strans}[0]{\m{strans} \;}
-\newcommand{\dc}{\m{derive}_c \;}
-\newcommand{\ao}{\m{apply}_1 \;}
+\newcommand{\mo}{\m{match}_{LLD} \;}
+\newcommand{\cont}{\m{cont}_{LLD} \;}
+\newcommand{\contc}{\m{cont}_{LLDc} \;}
+\newcommand{\done}{\m{derive}_{LLD} \;}
+\newcommand{\doo}{\m{run}_{LLD} \;}
+\newcommand{\mc}[0]{\m{match}_{LLDc} \; }
+\newcommand{\dall}[0]{\m{fix}_{LLD} \; }
+\newcommand{\strans}[0]{\m{update}_{LLD} \;}
+\newcommand{\dc}{\m{derive}_{LLDc} \;}
+\newcommand{\ao}{\m{apply}_{LLD} \;}
 
 We now present the sequent calculus of a fragment of intuitionistic linear
 logic~\cite{girard-87} used by LM followed by the dynamic semantics built on top of
