@@ -16,7 +16,7 @@ also allowed.
 
 The first argument of every predicate must be typed as a \emph{node}.
 For concurrency and data partitioning purposes, derivation rules are constrained by the expressions that can be written in the body.
-The body of every rule can only refer to facts in the same node.
+The body of every rule can only refer to facts in the same node (same first argument).
 However, the expressions in the head may refer to other nodes, as long as those nodes are instantiated in the body of the rule.
 
 Each rule in LM has a defined priority that is inferred from its position in the source file.

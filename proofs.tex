@@ -68,7 +68,8 @@ definitions. Given a comprehension $C = \{ \; \widehat{x}; \; A; \; B \; \}$ wit
 \]
 
 We can unfold $\compr{C}$ to either stop (by selecting $1$) or get a new linear implication $A \lolli B$
-to apply the comprehension once. Because we also get another $\compr{C}$ by selecting the right hand side,
+to apply the comprehension once. This uses linear logic's additive conjunction $\with$.
+Because we also get another $\compr{C}$ by selecting the right hand side,
 the comprehension can be applied again, recursively.
 
 This form of definition does not capture the desired \emph{maximality} aspect of the comprehension,
@@ -83,7 +84,10 @@ Aggregates work identically, but they need an extra argument to accumulate the a
 
 \subsection{Dynamic Semantics}
 
-The high level dynamic semantics (HLD) formalize the mechanism of matching and deriving a single rule. It is closely related to the fragment presented above.
+The high level dynamic semantics (HLD) formalize the mechanism of matching and deriving a single rule. The semantics receive the database and the program's rules as inputs and return as outputs the consumed linear facts, derived linear facts and derived persistent facts. Then, it is possible
+to compute the program as a sequence of steps, until no more rules are applicable.
+ 
+The HLD semantics are closely related to the linear logic fragment presented above.
 From the sequent calculus, we consider $\Gamma$ and $\Delta$ the database of persistent and linear facts, respectively.
 We consider the rules of the program as persistent linear implications of the form $\bang (A \lolli B)$ that we put in a separate context $\Phi$.
 We ignore the right hand side $C$ of the calculus and use inversion on the $\Delta$ and $\Gamma$ contexts so that we only have atomic terms (facts). To apply rules
@@ -192,6 +196,7 @@ since we assume that the database is global. We also omit the quantifiers and do
 
 The low level dynamic semantics (LLD) shown in \ref{low_level_semantics} improve upon HLD by adding rule priorities, by removing non-determinism
 when matching the body of rules by modeling all the matching steps and by applying comprehensions or aggregates as many times as the database allows.
+Selectors can also be trivially implemented in LLD, although they are not shown in paper.
 
 In LLD we try all the rules in order. For each rule, we use a \emph{continuation stack} to store the \emph{continuation frames} created by
 each fact template $p$ present

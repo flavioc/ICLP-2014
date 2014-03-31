@@ -18,6 +18,8 @@ the distance to the neighboring nodes by taking into account the edge weights.
 Eventually, the program will reach quiescence and the shortest distance between \texttt{startnode} and \texttt{finalnode}
 will be determined.
 
+\newcommand{\BigO}[1]{\ensuremath{\operatorname{O}\bigl(#1\bigr)}}
+
 \begin{figure}[h!]
 \footnotesize\begin{Verbatim}[numbers=left]
 type edge(node, node, int).
@@ -41,6 +43,10 @@ path(A, D, notused), A <> finalnode // propagate distance
 \label{code:shortest_path}
 \end{figure}
 \normalsize
+
+In the worst case, the algorithm presented in Fig.~\ref{code:shortest_path} runs in \BigO{N E}, where $N$ is the number of nodes and $E$ is the
+number of edges. If we decide to always propagate the shortest distance of the graph, we get Dijkstra's algorithm~\cite{Dijkstra}. However, this is
+not feasible, since we would need to globally decide which node to run next, and that would reduce parallelism.
 
 \paragraph{PageRank}
 
@@ -118,7 +124,8 @@ at that point. When a cell cannot place a queen, that state is deleted (lines 31
 When the program ends, the states will be placed in the bottom row (lines 59-61).
 
 We find our solution very elegant, since it can be easily distributed or executed in parallel.
-To the best of our knowledge it is also an unusual approach to this problem.
+Most parallel implementations distribute the search space of the problem, by assigning incomplete boards as tasks to workers.
+Our approach is unusual because our tasks are the cells of the board.
 
 \begin{comment}
 \subsection{Quick-Sort}
