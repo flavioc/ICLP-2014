@@ -39,7 +39,7 @@ In the following sections, we present the syntax and semantics of our language a
 \begin{description}
    \item[Linear Logic:] We integrate linear logic into the original Meld language so that program state can be encoded naturally.
    Meld started as a classical logic programming language where everything that is derived is true until the end
-   of the execution. Linear logic turns logical facts into resources that will be consumed when a rule is applied. In turn, this makes it possible to represent program state in a natural, safe and declarative fashion.
+   of the execution. Linear logic turns logical facts into resources that will be consumed when a rule is applied. In turn, this makes it possible to represent program state in a natural and declarative fashion.
    \item[Concurrency:] LM programs are naturally concurrent because facts are partitioned by vertices of a graph data structure. While the original Meld sees graphs as a network of robots, we see each node as a member of a distributed data structure. This is made possible due to the
    restrictions on derivation rules which only use local facts but also permit node communication.
    \item[Semantics:] Starting from a fragment of linear logic used in LM, we formalize a high level dynamic semantics that is closely related to this fragment.
@@ -55,3 +55,5 @@ Several interesting programs were implemented such as belief propagation~\cite{G
 belief propagation with residual splash~\cite{Gonzalez+al:aistats09paraml}, PageRank, graph coloring,
 N queens, shortest path, diameter estimation, map reduce, game of life, quick-sort, neural network training, among others.
 While these results are evidence that LM is a promising language, this paper will only focus on the more formal aspects of our work.
+
+\vspace{-4mm}

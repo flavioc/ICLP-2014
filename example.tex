@@ -36,9 +36,8 @@ The general form of a rule is $\mathtt{A_1},...,\mathtt{A_n}$ \texttt{-o} $\math
 When persistent facts are used (line 5) they must be
 preceded by \texttt{!} for readability.
 
-{\scriptsize
 \begin{figure}[h!]
-\begin{Verbatim}[numbers=left]
+\scriptsize\begin{Verbatim}[numbers=left]
 type edge(node, node). // define direct edge
 type linear message(node, string, list node). // message format
 
@@ -54,7 +53,7 @@ message(@1, 'Hello World', [@3, @4]).
 \caption{Message program.}
   \label{code:message}
 \end{figure}
-}
+\normalsize
 
 The first rule (lines 4-6) grabs the next node in the route list (third argument of \texttt{message/3}) and
 ensures that a communication edge exists (through \texttt{edge(A, B)}).
@@ -72,9 +71,8 @@ The second rule (line 9) is fired when a
 node \texttt{A} is already visited more than once: we keep the \texttt{visited(A)} fact and delete \texttt{visit(A)}.
 Line 13 starts the process by asserting the \texttt{visit(@1)} fact.
 
-{\footnotesize
 \begin{figure}[h!]
-\begin{Verbatim}[numbers=left]
+\scriptsize\begin{Verbatim}[numbers=left]
 type edge(node, node).
 type linear visit(node).
 type linear unvisited(node).
@@ -91,7 +89,10 @@ visit(@1).
 \end{Verbatim}
   \caption{Visit program.}
   \label{code:visit}
-\end{figure}}
+\end{figure}
+\normalsize
 
 If the graph is connected, it is easy to prove that every node \texttt{A} will derive \texttt{visited(A)},
 regardless of the order in which rules are applied.
+
+\vspace{-4mm}

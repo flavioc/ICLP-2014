@@ -2,16 +2,14 @@ Due to the restrictions on LM rules and the partitioning of facts across the gra
 run rules independently without using other node's facts. Node computation follows a \emph{don't care} or \emph{committed choice} non-determinism
 since any node can be picked to run as long as it contains enough facts to fire a derivation rule.
 Facts coming from other nodes will arrive in order of derivation but may be considered
-partially and there is no particular order among the neighborhood. To improve parallelism, the programmer is encourage to write rules to take
+partially and there is no particular order among the neighborhood. To improve parallelism, the programmer is encouraged to write rules to take
 advantage of the non-deterministic nature of execution.
 
-LM programs can then be made concurrent by simply processing many nodes concurrently. In practice this can be done in many ways, for instance,
-given P processing units and N nodes, we could place the nodes in a work queue and then each processing unit would take
-a node from the queue, process it, and then place it back at the end of the queue. This trivial technique works but there is no consideration
-for node connections and data locality. Our implementation partitions the graph of N nodes into P subgraphs and then each
-processing unit will work on its subgraph.
+LM programs can then be made concurrent by simply processing many nodes concurrently.
+Our implementation partitions the graph of N nodes into P subgraphs and then each processing unit will work on its subgraph.
 For improved load balancing we use node stealing during starvation.
-
 Our results show that LM programs running on multicores have good scalability.
 The implementation of the compiler and virtual machine and
 the analysis of experimental results will be presented in a future paper.
+
+\vspace{-4mm}

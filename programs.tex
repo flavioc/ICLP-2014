@@ -20,8 +20,8 @@ will be determined.
 
 \newcommand{\BigO}[1]{\ensuremath{\operatorname{O}\bigl(#1\bigr)}}
 
-\begin{figure}[h!]
-\footnotesize\begin{Verbatim}[numbers=left]
+\begin{figure}[h]
+\scriptsize\begin{Verbatim}[numbers=left]
 type edge(node, node, int).
 type linear path(node, int, int).
 
@@ -44,25 +44,20 @@ path(A, D, notused), A <> finalnode // propagate distance
 \end{figure}
 \normalsize
 
-In the worst case, the algorithm presented in Fig.~\ref{code:shortest_path} runs in \BigO{N E}, where $N$ is the number of nodes and $E$ is the
+In the worst case, this algorithm runs in \BigO{N E}, where $N$ is the number of nodes and $E$ is the
 number of edges. If we decide to always propagate the shortest distance of the graph, we get Dijkstra's algorithm~\cite{Dijkstra}. However, this is
-not feasible, since we would need to globally decide which node to run next, and that would reduce parallelism.
+not feasible, since we would need to globally decide which node to run next, removing parallelism.
 
 \paragraph{PageRank}
 
 PageRank~\cite{Page:2001:MNR} is a well known graph algorithm that is used to compute the relative relevance of web pages.
 The code for a synchronous version of the algorithm is shown in Fig.~\ref{code:pagerank}.
 As the name indicates, the pagerank is computed for a certain number of iterations. The initial pagerank is the same for every page and is
-initialized in the first rule (lines 15-16) along with an accumulator.
+initialized in the first rule (line 12) along with an accumulator.
 
-The second rule of the program (lines 18-22) propagates a newly computed pagerank value to all neighbors. Each node will then accumulate
-the pagerank values that are sent to them through the fourth rule (lines 30-32) and it will immediately add other currently available values
-through the use of the aggregate. When we have accumulated all the values we need, the third rule (lines 24-28) is fired and a new pagerank value is derived.
 
-We also have an asynchronous version of the algorithm that trades correctness with convergence speed since it does not synchronize between iterations.
-
-\begin{figure}[h!]
-   \footnotesize\begin{Verbatim}[numbers=left]
+\begin{figure}[h]
+   \scriptsize\begin{Verbatim}[numbers=left]
 type output(node, node, float).
 type linear pagerank(node, float, int).
 type numLinks(node, int).
@@ -71,14 +66,10 @@ type linear accumulator(node, float, int, int).
 type linear newrank(node, node, float, int).
 type linear start(node).
 
-const damping = 0.85.
 const iterations = str2int(@arg1).
-const pages = @world.
 
 start(A).
-
-start(A), !numInput(A, T)
-   -o accumulator(A, 0.0, T, 1), pagerank(A, 1.0 / float(pages), 0).
+start(A), !numInput(A, T) -o accumulator(A, 0.0, T, 1), pagerank(A, 1.0 / float(@world), 0).
 
 pagerank(A, V, Id), // propagate new pagerank value
 !numLinks(A, C),
@@ -88,18 +79,23 @@ Result = V / float(C)
 
 accumulator(A, Acc, 0, Id), // new pagerank
 !numInput(A, T),
-V = damping + (1.0 - damping) * Acc,
+V = 0.85 + 0.15 * Acc,
 Id <= iterations
    -o pagerank(A, V, Id), accumulator(A, 0.0, T, Id + 1).
 	
 newrank(A, B, V, Id), accumulator(A, Acc, T, Id), T > 0
-   -o [sum => S, count => C | D | newrank(A, D, S, Id) |
-            1 | accumulator(A, Acc + V + S, T - 1 - C, Id)].
+   -o [sum => S, count => C | D | newrank(A, D, S, Id) | 1 | accumulator(A, Acc + V + S, T - 1 - C, Id)].
 \end{Verbatim}
 \caption{Synchronous PageRank program.}
 \label{code:pagerank}
 \normalsize
 \end{figure}
+
+The second rule of the program (lines 14-18) propagates a newly computed pagerank value to all neighbors. Each node will then accumulate
+the pagerank values that are sent to them through the fourth rule (lines 26-27) and it will immediately add other currently available values
+through the use of the aggregate. When we have accumulated all the values we need, the third rule (lines 20-24) is fired and a new pagerank value is derived.
+
+%We also have an asynchronous version of the algorithm that trades correctness with convergence speed since it does not synchronize between iterations.
 
 \paragraph{N-Queens}
 
@@ -118,43 +114,10 @@ means that a queen is placed in cell \texttt{(0,~0)} and another in cell \texttt
 An empty state is instantiated in the top-left node \texttt{(0,~0)} and then propagated to all nodes in the same row (lines 20-22).
 Each node then tries to place a queen on their cell and then send a new state to the row below (lines 63-65).
 Recursively, when a node receives a new state, it will (i) send the state to the left
-or to the right and (ii) try to place the queen in its cell (using \texttt{test-y}, \texttt{test-diag-left} and \texttt{test-diag-right}). With this method,
-all states will be computed since we have facts for each valid state
-at that point. When a cell cannot place a queen, that state is deleted (lines 31, 42 and 54).
+or to the right and (ii) try to place the queen in its cell (using \texttt{test-y}, \texttt{test-diag-left} and \texttt{test-diag-right}). When a cell cannot place a queen, that state is deleted (lines 31, 42 and 54).
 When the program ends, the states will be placed in the bottom row (lines 59-61).
 
-We find our solution very elegant, since it can be easily distributed or executed in parallel.
-Most parallel implementations distribute the search space of the problem, by assigning incomplete boards as tasks to workers.
+Most parallel implementations distribute the search space of the problem by assigning incomplete boards as tasks to workers.
 Our approach is unusual because our tasks are the cells of the board.
 
-\begin{comment}
-\subsection{Quick-Sort}
-
-The quick-sort algorithm is a divide and conquer sorting algorithm that works by splitting
-a list of items into two sublists and then recursively sorting the two sublists.
-To split the list, we pick a pivot element and put the items that are smaller than the pivot
-into the first sublist and items greater than the pivot into the second list.
-
-The quick-sort algorithm is interesting because it does not map immediately to the graph-based
-model of LM. Our approach considers that the program starts with a single node where
-the initial list is located. Then we split the list as usual and create two nodes
-that will recursively sort the sublists. Interestingly, this will create a tree
-that will look similar to a call tree in a functional language.
-
-Appendix~\ref{code:quicksort} presents the code for the quick-sort algorithm in LM.
-For each sublist to sort, we start with a \texttt{down} fact that must be (eventually)
-transformed into an \texttt{up} fact, where the sublist in the \texttt{up} fact is sorted.
-In line 11 we start with the initial list at node \texttt{@0}. Lines 13-16 will immediately
-sort the list when the number of items is very small. Otherwise, we apply the rule in line 17.
-\texttt{buildpivot} will first split the list using the pivot \texttt{X} using rules in
-lines 23-26. When there is nothing more to split, we apply the rule in lines 19-21
-that uses an exists constructor to create nodes \texttt{B} and \texttt{C}. The sublists
-are then sent to these nodes using \texttt{down} facts. Note, however, that we also
-derive \texttt{back} facts, that will be used to send the sorted list back using the rule
-in line 40.
-
-When the sublists are finally sorted, we get two \texttt{sorted} facts that will match
-against \texttt{waitpivot} in the rule located in lines 28-31. The sorted sublists
-are appended and then an \texttt{up} fact is finally derived (line 37).
-
-\end{comment}
+\vspace{-4mm}
