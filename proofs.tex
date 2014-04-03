@@ -21,7 +21,7 @@
 \newcommand{\ao}{\m{apply}_{LLD} \;}
 
 We now present the sequent calculus of a fragment of intuitionistic linear
-logic~\cite{girard-87} used by LM followed by the dynamic semantics built on top of
+logic~\cite{girard-87} used by LM followed by the dynamic semantics of LM built on top of
 this fragment.
 
 We use a standard set of connectives except the $\m{def} \; A$ connective, which is inspired on Baelde's work on least and
@@ -29,10 +29,10 @@ greatest fixed points in linear logic~\cite{Baelde:2012:LGF:2071368.2071370} and
 comprehensions and aggregates.
 The sequent calculus (\ref{linear_logic}) has the form $\Psi; \Gamma; \Delta \rightarrow C$, where $\Psi$ is the typed term context used in the
 quantifiers, $\Gamma$ is the set of persistent terms, $\Delta$ is the multi-set of linear propositions and $C$ is the proposition
-to prove. Table~\ref{table:linear} relates the proof system with LM.
+to prove. Table~\ref{table:linear} relates linear logic with LM.
 
 \begin{center}
-\begin{table}[h]\resizebox{13cm}{!}{
+\begin{table}[h]\resizebox{12cm}{!}{
     \begin{tabular}{ c l c l}
     \hline
     Connective                   & Description                                        & LM Place   & LM Example                           \\ \hline \hline
@@ -73,14 +73,15 @@ Aggregates work identically, but they need an extra argument to accumulate the a
 
 \paragraph{High Level Dynamic Semantics}
 
-The high level dynamic semantics (HLD) formalize the mechanism of matching and deriving a single rule. The semantics receive the database and the program's rules as inputs and return as outputs the consumed linear facts, derived linear facts and derived persistent facts. Then, it is possible
-to compute the program as a sequence of steps, until no more rules are applicable.
- 
-The HLD semantics are closely related to the linear logic fragment presented above.
+The dynamic semantics formalize the mechanism of matching and deriving a single rule at the node level. The semantics receive the node database and the program's rules as inputs and return as outputs the consumed linear facts, derived linear facts and derived persistent facts. Then, it is possible
+to compute the program as a sequence of steps, by updating the database (by sending or asserting).
+
+The High Level Dynamic Semantics (HLD) are closely related to the linear logic fragment presented above.
 From the sequent calculus, we consider $\Gamma$ and $\Delta$ the database of persistent and linear facts, respectively.
 We consider the rules of the program as persistent linear implications of the form $\bang (A \lolli B)$ that we put in a separate context $\Phi$.
 We ignore the right hand side $C$ of the calculus and use inversion on the $\Delta$ and $\Gamma$ contexts so that we only have atomic terms (facts). To apply rules
-we use chaining by focusing on the derivation rules of $\Phi$.
+we use chaining by focusing~\cite{Andreoli92logicprogramming} on the derivation rules of $\Phi$.
+The HLD semantics are shown in Fig.~\ref{hld_semantics} and are composed of four judgments:
 
 \begin{figure}[h]
    {\scriptsize
@@ -164,7 +165,6 @@ we use chaining by focusing on the derivation rules of $\Phi$.
 \label{hld_semantics}
 \end{figure}
 
-The HLD semantics are shown in Fig.~\ref{hld_semantics} and are composed of four judgments:
 \begin{enumerate}
    \item $\doz \Gamma; \Delta; \Phi \rightarrow \Xi'; \Delta'; \Gamma'$ picks a rule from $\Phi$ and applies it using facts from $\Gamma$ and $\Delta$. $\Xi'$, $\Delta'$ and $\Gamma'$ are the outputs of the derivation process. $\Xi'$ are the linear facts consumed, $\Delta'$ are the linear facts derived and $\Gamma'$ the new persistent facts;
    \item $\az \Gamma; \Delta; R \rightarrow \Xi'; \Delta'; \Gamma'$ picks a subset of linear facts from $\Delta$ and matches the body of the rule $R$ and then derives the head;
