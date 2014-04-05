@@ -15,16 +15,15 @@ The Pregel system~\cite{Malewicz:2010:PSL:1807167.1807184} is also graph-based, 
 structure. They must be represented as a sequence of iterations where each iteration is composed of computation and message passing.
 Pregel is aimed at solving very big graphs
 and to scale to large architectures. GraphLab~\cite{GraphLab2010} is a C++ library for developing parallel machine learning algorithms. While
-Pregel uses message passing, GraphLab allows nodes to have read/write access to different scopes through different concurrent access models in order to balance performance and data consistency. While some programs only need to access the local node's data, others may need to update edge information. Each consistency model provides different guarantees that are suited to multiple classes of algorithms. GraphLab also provides several schedulers that dictate the order in which node's are computed.
+Pregel uses message passing, GraphLab allows nodes to have read/write access to different scopes through different concurrent access models in order to balance performance and data consistency. Each consistency model provides different guarantees that are suited to multiple classes of algorithms. GraphLab also provides several schedulers that dictate the order in which node's are computed.
 
 An alternative promising approach for graph-based algorithms 
 is logic programming. For instance, the P2 system~\cite{Loo-condie-garofalakis-p2}, used Datalog to map nodes of a computer network
 to a graph, where each node would do computation locally and could communicate with neighbor nodes.
 Another good example is the Meld language, created by
-Ashley-Rollman et al.~\cite{ashley-rollman-derosa-iros07wksp,ashley-rollman-iclp09}, which was designed to
-program massively distributed systems made of modular robots with a dynamic topology. Meld was itself inspired
-in the P2 system because it is based on the graph model of computation but adapted to the concept of moving
-robots.
+Ashley-Rollman et al.~\cite{ashley-rollman-derosa-iros07wksp,ashley-rollman-iclp09}.
+Meld was itself inspired in the P2 system but adapted to the concept of massively distributed systems made of modular robots with a
+dynamic topology.
 Logic-based systems are more amenable to proof since a program is just a set of logical clauses.
 
 In this paper, we present a new logic programming language called LM (Linear Meld) for concurrent programming over graph structures designed to take advantage
@@ -55,5 +54,3 @@ Several interesting programs were implemented such as belief propagation~\cite{G
 belief propagation with residual splash~\cite{Gonzalez+al:aistats09paraml}, PageRank, graph coloring,
 N queens, shortest path, diameter estimation, map reduce, game of life, quick-sort, neural network training, among others.
 While these results are evidence that LM is a promising language, this paper will only focus on the more formal aspects of our work.
-
-\vspace{-4mm}

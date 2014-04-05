@@ -71,12 +71,14 @@ Aggregates work identically, but they need an extra argument to accumulate the a
 \compr{C} \; V \defeq (\lambda v. B_2)V \with (\forall x. ((Ax \lolli B_1) \otimes \compr{C} \; (x + V)))
 \]
 
-\paragraph{High Level Dynamic Semantics}
+\paragraph{Dynamic Semantics}
 
 The dynamic semantics formalize the mechanism of matching and deriving a single rule at the node level. The semantics receive the node database and the program's rules as inputs and return as outputs the consumed linear facts, derived linear facts and derived persistent facts. Then, it is possible
-to compute the program as a sequence of steps, by updating the database (by sending or asserting).
+to compute the program as a sequence of steps, by updating the database through sending or asserting.
 
-The High Level Dynamic Semantics (HLD) are closely related to the linear logic fragment presented above.
+\paragraph{High Level Dynamic Semantics}
+
+The High Level Dynamic~(HLD) Semantics are closely related to the linear logic fragment presented above.
 From the sequent calculus, we consider $\Gamma$ and $\Delta$ the database of persistent and linear facts, respectively.
 We consider the rules of the program as persistent linear implications of the form $\bang (A \lolli B)$ that we put in a separate context $\Phi$.
 We ignore the right hand side $C$ of the calculus and use inversion on the $\Delta$ and $\Gamma$ contexts so that we only have atomic terms (facts). To apply rules
@@ -174,9 +176,9 @@ The HLD semantics are shown in Fig.~\ref{hld_semantics} and are composed of four
 
 Comprehensions are derived by non-deterministically deciding to apply the comprehension ($\m{derive} \with L$ and $\m{derive} \with R$)
 and then using the $\mz$judgment in the rule $\dz comp$. We note that the HLD semantics do not take distribution into account,
-since we assume that the database is global. We also omit the quantifiers and do not deal with unification since it complicates the formal system.
+since we assume that the database is global. We do not deal with unification or quantifiers since this is a well understood problem~\cite{Baader:1994:UT:185705.185711}.
 
-\paragraph{Low Level Dynamic Semantics} The low level dynamic semantics (LLD) shown in \ref{low_level_semantics} improve upon HLD by adding rule priorities, by removing non-determinism
+\paragraph{Low Level Dynamic Semantics} The Low Level Dynamic~(LLD) Semantics shown in \ref{low_level_semantics} improve upon HLD by adding rule priorities, by removing non-determinism
 when matching the body of rules by modeling all the matching steps and by applying comprehensions or aggregates as many times as the database allows.
 Selectors can also be trivially implemented in LLD, although they are not shown in paper.
 
@@ -265,5 +267,3 @@ $n$ (where $n \ge 0$) applications of the comprehension and $n \; \m{match}$ and
 that can be used to rebuild the derivation tree at the low level by using the $\dz \with L$, $\dz \with R$
 and $\dz \lolli$ rules to fold and unfold the comprehension term. The theorem for aggregates works similarly.
 \end{comment}
-
-\vspace{-4mm}

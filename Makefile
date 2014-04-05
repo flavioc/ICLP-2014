@@ -5,7 +5,8 @@ paper.pdf: Makefile paper.tex abstract.tex introduction.tex	\
 		language.tex programs.tex proofs.tex \
 		appendix.tex conclusion.tex \
 		example.tex concurrency.tex \
-		refs.bib related_work.tex
+		refs.bib related_work.tex \
+		appendix.tex
 	pdflatex paper.tex
 	pdflatex paper.tex
 	bibtex paper

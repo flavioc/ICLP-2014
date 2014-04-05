@@ -33,7 +33,7 @@ true once they are derived.
 
 The program rules are declared in lines 4-8, while the program's axioms are written in lines 10-11.
 The general form of a rule is $\mathtt{A_1},...,\mathtt{A_n}$ \texttt{-o} $\mathtt{B_1},...,\mathtt{B_m}$, where $\mathtt{A_1},...,\mathtt{A_n}$ are matched against local facts and $\mathtt{B_1},...,\mathtt{B_m}$ are locally asserted or transmitted to a neighboring node.
-When persistent facts are used (line 5) they must be
+When persistent facts are used (line 4) they must be
 preceded by \texttt{!} for readability.
 
 \begin{figure}[h!]
@@ -41,11 +41,11 @@ preceded by \texttt{!} for readability.
 type edge(node, node). // define direct edge
 type linear message(node, string, list node). // message format
 
-message(A, Content, [B | L]),
-!edge(A, B)
+message(A, Content, [B | L]), !edge(A, B)
    -o message(B, Content, L). // message derived at node B
 
-message(A, Content, []) -o 1. // message received
+message(A, Content, [])
+   -o 1. // message received
 
 !edge(@1, @2). !edge(@2, @3). !edge(@3, @4). !edge(@1, @3).
 message(@1, 'Hello World', [@3, @4]).
@@ -55,11 +55,11 @@ message(@1, 'Hello World', [@3, @4]).
 \end{figure}
 \normalsize
 
-The first rule (lines 4-6) grabs the next node in the route list (third argument of \texttt{message/3}) and
-ensures that a communication edge exists (through \texttt{edge(A, B)}).
-A new \texttt{message(B,~Content,~L)} fact is derived at node \texttt{B}.
+The first rule (lines 4-5) grabs the next node in the route list (third argument of \texttt{message/3}),
+ensures that a communication edge exists with \texttt{!edge(A, B)} and
+derives a new \texttt{message(B,~Content,~L)} fact at node \texttt{B}.
 When the route list is empty, the message has reached its destination and thus it is consumed
-(rule in lines 8-9). Note that the '\texttt{1}' in the head of the rule on line 8 means that nothing is derived.
+(rule in lines 7-8). Note that the '\texttt{1}' in the head of the rule on line 8 means that nothing is derived.
 
 Figure~\ref{code:visit} presents another complete LM program which given a graph
 of nodes visits all nodes reachable from node $@1$.
@@ -67,9 +67,9 @@ The first rule of the program (lines 6-7) is fired when a node \texttt{A} has bo
 When fired, we first derive \texttt{visited(A)} to mark node \texttt{A} as \textit{visited} and use a
 \emph{comprehension} to go through all the edge facts \texttt{edge(A,B)} and derive \texttt{visit(B)} for each
 one (comprehensions are explained next in detail). This forces those nodes to be visited.
-The second rule (line 9) is fired when a
+The second rule (lines 9-10) is fired when a
 node \texttt{A} is already visited more than once: we keep the \texttt{visited(A)} fact and delete \texttt{visit(A)}.
-Line 13 starts the process by asserting the \texttt{visit(@1)} fact.
+Line 14 starts the process by asserting the \texttt{visit(@1)} fact.
 
 \begin{figure}[h!]
 \scriptsize\begin{Verbatim}[numbers=left]
@@ -78,10 +78,11 @@ type linear visit(node).
 type linear unvisited(node).
 type linear visited(node).
 
-visit(A), unvisited(A) // mark node as visited and visit neighbors
-   -o visited(A), {B | !edge(A, B) | visit(B)}.
+visit(A), unvisited(A)
+   -o visited(A), {B | !edge(A, B) | visit(B)}. // mark node as visited and visit neighbors
 
-visit(A), visited(A) -o visited(A). // already visited
+visit(A), visited(A)
+   -o visited(A). // already visited
 
 !edge(@1, @2). !edge(@2, @3). !edge(@1, @4). !edge(@2, @4).
 unvisited(@1). unvisited(@2). unvisited(@3). unvisited(@4).
@@ -94,5 +95,3 @@ visit(@1).
 
 If the graph is connected, it is easy to prove that every node \texttt{A} will derive \texttt{visited(A)},
 regardless of the order in which rules are applied.
-
-\vspace{-4mm}

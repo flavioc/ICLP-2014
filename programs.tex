@@ -6,11 +6,11 @@ We now present LM programs in order to illustrate common programming techniques\
 Finding the shortest distance between two nodes in a graph is another well known graph problem.
 Fig.~\ref{code:shortest_path} presents the LM code to solve this particular problem.
 
-We use an \texttt{edge}
+We use an \texttt{edge/3}
 predicate to represent directed edges between nodes and their corresponding weights. To represent the shortest
-distance to a node \texttt{startnode} we have a \texttt{path(A, B, F)} where \texttt{B} is the distance to \texttt{startnode}
+distance to a node \texttt{startnode} we have a \texttt{path(A,D,F)} where \texttt{D} is the distance to \texttt{startnode}
 and \texttt{F} is a flag to indicate if such distance has been propagated to the neighbors. Since the distance from
-the \texttt{startnode} to itself is \texttt{0}, we start with the axiom \texttt{path(startnode, 0, notused)} to start the algorithm.
+the \texttt{startnode} to itself is \texttt{0}, we start the algorithm with the axiom \texttt{path(startnode,0,notused)}.
 
 The first rule avoids propagating paths with the same distance and the second rule eliminates paths where the distance
 is already larger than some other distance. Finally, the third rule, marks the path as \texttt{used} and propagates
@@ -30,14 +30,14 @@ const notused = 0.
 
 path(startnode, 0, notused).
 
-path(A, B, used), path(A, B, notused)
-   -o path(A, B, used).
+path(A, D, used), path(A, D, notused)
+   -o path(A, D, used).
 
-path(A, B1, X), path(A, B2, Y), B1 <= B2
-   -o path(A, B1, X). // keep the shorter distance
+path(A, D1, X), path(A, D2, Y), D1 <= D2
+   -o path(A, D1, X). // keep the shorter distance
 
-path(A, D, notused), A <> finalnode // propagate distance
-   -o {B, W | !edge(A, B, W) | path(B, D + W, notused)}, path(A, D, used).
+path(A, D, notused), A <> finalnode
+   -o {B, W | !edge(A, B, W) | path(B, D + W, notused)}, path(A, D, used). // propagate new distance
 \end{Verbatim}
 \caption{Shortest Distance Program.}
 \label{code:shortest_path}
@@ -46,7 +46,7 @@ path(A, D, notused), A <> finalnode // propagate distance
 
 In the worst case, this algorithm runs in \BigO{N E}, where $N$ is the number of nodes and $E$ is the
 number of edges. If we decide to always propagate the shortest distance of the graph, we get Dijkstra's algorithm~\cite{Dijkstra}. However, this is
-not feasible, since we would need to globally decide which node to run next, removing parallelism.
+not feasible, since we would need to globally decide which node to run next, removing concurrency.
 
 \paragraph{PageRank}
 
@@ -66,22 +66,16 @@ type linear accumulator(node, float, int, int).
 type linear newrank(node, node, float, int).
 type linear start(node).
 
-const iterations = str2int(@arg1).
-
 start(A).
-start(A), !numInput(A, T) -o accumulator(A, 0.0, T, 1), pagerank(A, 1.0 / float(@world), 0).
 
-pagerank(A, V, Id), // propagate new pagerank value
-!numLinks(A, C),
-Id < iterations,
-Result = V / float(C)
-   -o {B, W | !output(A, B, W) | newrank(B, A, Result, Id + 1)}.
+start(A), !numInput(A, T)
+   -o accumulator(A, 0.0, T, 1), pagerank(A, 1.0 / float(@world), 0).
 
-accumulator(A, Acc, 0, Id), // new pagerank
-!numInput(A, T),
-V = 0.85 + 0.15 * Acc,
-Id <= iterations
-   -o pagerank(A, V, Id), accumulator(A, 0.0, T, Id + 1).
+pagerank(A, V, Id), !numLinks(A, C), Id < iterations, Result = V / float(C)
+   -o {B, W | !output(A, B, W) | newrank(B, A, Result, Id + 1)}. // propagate new pagerank value
+
+accumulator(A, Acc, 0, Id), !numInput(A, T), V = 0.85 + 0.15 * Acc, Id <= iterations
+   -o pagerank(A, V, Id), accumulator(A, 0.0, T, Id + 1). // new pagerank value
 	
 newrank(A, B, V, Id), accumulator(A, Acc, T, Id), T > 0
    -o [sum => S, count => C | D | newrank(A, D, S, Id) | 1 | accumulator(A, Acc + V + S, T - 1 - C, Id)].
@@ -91,9 +85,9 @@ newrank(A, B, V, Id), accumulator(A, Acc, T, Id), T > 0
 \normalsize
 \end{figure}
 
-The second rule of the program (lines 14-18) propagates a newly computed pagerank value to all neighbors. Each node will then accumulate
-the pagerank values that are sent to them through the fourth rule (lines 26-27) and it will immediately add other currently available values
-through the use of the aggregate. When we have accumulated all the values we need, the third rule (lines 20-24) is fired and a new pagerank value is derived.
+The second rule of the program (lines 14-15) propagates a newly computed pagerank value to all neighbors. Each node will then accumulate
+the pagerank values that are sent to them through the fourth rule (lines 20-21) and it will immediately add other currently available values
+through the use of the aggregate. When we have accumulated all the values we need, the third rule (lines 17-18) is fired and a new pagerank value is derived.
 
 %We also have an asynchronous version of the algorithm that trades correctness with convergence speed since it does not synchronize between iterations.
 
@@ -111,13 +105,11 @@ to cells \texttt{(0,~2)}, \texttt{(0,~4)} and also \texttt{(1,~1)} and \texttt{(
 of integers, where each integer is the column number where the queen was placed. For example \texttt{[2, 0]}
 means that a queen is placed in cell \texttt{(0,~0)} and another in cell \texttt{(1,~2)}.
 
-An empty state is instantiated in the top-left node \texttt{(0,~0)} and then propagated to all nodes in the same row (lines 20-22).
-Each node then tries to place a queen on their cell and then send a new state to the row below (lines 63-65).
+An empty state is instantiated in the top-left node \texttt{(0,~0)} and then propagated to all nodes in the same row (lines 19-20).
+Each node then tries to place a queen on their cell and then send a new state to the row below (lines 52-54).
 Recursively, when a node receives a new state, it will (i) send the state to the left
-or to the right and (ii) try to place the queen in its cell (using \texttt{test-y}, \texttt{test-diag-left} and \texttt{test-diag-right}). When a cell cannot place a queen, that state is deleted (lines 31, 42 and 54).
-When the program ends, the states will be placed in the bottom row (lines 59-61).
+or to the right and (ii) try to place the queen in its cell (using \texttt{test-y}, \texttt{test-diag-left} and \texttt{test-diag-right}). When a cell cannot place a queen, that state is deleted (lines 29, 37 and 45).
+When the program ends, the states will be placed in the bottom row (lines 49-50).
 
 Most parallel implementations distribute the search space of the problem by assigning incomplete boards as tasks to workers.
 Our approach is unusual because our tasks are the cells of the board.
-
-\vspace{-4mm}

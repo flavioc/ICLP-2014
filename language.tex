@@ -118,6 +118,4 @@ count-prices(A) -o [sum => P | . | price(A, P) | 1 | total(A, P)].
 By applying the rule, we consume \texttt{count-prices(@1)} and
 derive the aggregate which consumes all the \texttt{price(@1, P)} facts.
 These are added and \texttt{total(@1,~12)} is derived.
-LM provides aggregate operations such as minimum, maximum, sum, and count.
-
-\vspace{-4mm}
+LM provides aggregate operations such as \texttt{min} (minimum), \texttt{max} (maximum), \texttt{sum} and \texttt{count}.

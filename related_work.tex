@@ -4,9 +4,9 @@ that is intended to be executed over graph structures. Although there are a few 
 Meld~\cite{ashley-rollman-iclp09}, or Dedalus~\cite{Alvaro:EECS-2009-173} that already do this, they are based on classical logic, where facts are persistent. For most of these systems, there's no concept of state, except for Dedalus where state is modeled as time.
 
 Linear logic has been used in the past as a basis for logic-based programming languages~\cite{Miller85anoverview}, including bottom-up and top-down programming languages. Lolli, a programming language presented in~\cite{Hodas94logicprogramming}, is based on a fragment of intuitionistic linear logic
-and proves goals by lazily managing the context of linear resources during top-down proof search. LolliMon~\cite{Lopez:2005:MCL:1069774.1069778} is a concurrent linear logic programming language that integrates both bottom-up and top-down search, where bottom-up computations are encapsulated inside a monad and are concurrent, while top-down search is done sequentially. The programs starts by performing top-down search but this can be suspended in order to perform bottom-up search. This concurrent bottom-up search stops until a fix-point is achieved, after which top-down search is resumed. LolliMon is derived from the a concurrent logical framework called CLF~\cite{Watkins:2004uq,Cervesato02aconcurrent,Watkins03aconcurrent}.
+and proves goals by lazily managing the context of linear resources during top-down proof search. LolliMon~\cite{Lopez:2005:MCL:1069774.1069778} is a concurrent linear logic programming language that integrates both bottom-up and top-down search, where top-down search is done sequentially but bottom-up computations, which are encapsulated inside a monad, can be performed concurrently. Programs start by performing top-down search but this can be suspended in order to perform bottom-up search. This concurrent bottom-up search stops until a fix-point is achieved, after which top-down search is resumed. LolliMon is derived from the concurrent logical framework called CLF~\cite{Watkins:2004uq,Cervesato02aconcurrent,Watkins03aconcurrent}.
 
-As a bottom-up linear logic programming language, LM shares similarities with Constraint Handling Rules (CHR)~\cite{Betz:2005kx,Betz:2013:LBA:2422085.2422086}.
+Since LM is a bottom-up linear logic programming language, it also shares similarities with Constraint Handling Rules (CHR)~\cite{Betz:2005kx,Betz:2013:LBA:2422085.2422086}.
 CHR is a concurrent committed-choice constraint language used to write constraint solvers. A CHR program is a set of rules and
 a set of constraints (which can be seen as facts). Constraints can be consumed or generated during the application of rules.
 Unlike LM, in CHR there is no
@@ -15,9 +15,7 @@ Finally, there is also a CHR extension that adds persistent constraints and it h
 
 Graph Transformation Systems (GTS)~\cite{Ehrig:2004vn}, commonly used to model distributed systems, perform rewriting of graphs through
 a set of graph productions. GTS also introduces
-concepts of parallelism, where it may be possible to apply several transformations at the same time. In principle, it should be possible to model
+concepts of concurrency, where it may be possible to apply several transformations at the same time. In principle, it should be possible to model
 LM programs as a graph transformation: we directly map the LM graph of nodes to GTS's initial graph and consider logical facts as nodes that are connected
 to LM's nodes. Each LM rule is then a graph production that manipulates the node's neighbors (the database) or sends new facts to other nodes.
 On the other hand, it is also possible to embed GTS inside CHR~\cite{Raiser:2011:AGT:1972935.1972938}.
-
-\vspace{-4mm}
