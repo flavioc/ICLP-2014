@@ -1,0 +1,183 @@
+
+\section{Proof Theory}
+
+\begin{frame}[fragile]
+   \frametitle{Proof Theory}
+   \begin{itemize}
+      \item LM is based on a fragment of linear logic extended with definitions (for comprehensions and aggregates)
+      \item Designed two dynamic semantics:
+      \begin{itemize}
+         \item High Level Dynamic (HLD) Semantics:
+         \begin{itemize}
+            \item Sequent calculus + focusing with positive atoms
+            \item To apply a rule, \emph{focus} on the rule as an implication
+            \item Rule selection and comprehension application are non-deterministic and do not fully describe the behavior of LM
+         \end{itemize}
+         \item Low Level Dynamic (LLD) Semantics
+         \begin{itemize}
+            \item Close to the real implementation
+            \item Describes rule selection and rule matching using a continuation stack
+            \item Comprehensions are maximally applied
+         \end{itemize}
+      \end{itemize}
+      \item The semantics model a single rule application:
+      \begin{itemize}
+         \item Input: Linear context ($\Delta$), Persistent Context ($\Gamma$), Rules ($\Phi$)
+         \item Output: Derived Linear context ($\Delta'$), Derived Persistent context ($\Gamma'$), Consumed Linear context ($\Xi'$)
+      \end{itemize}
+   \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+   \frametitle{Proof Theory: HLD}
+   \begin{block}{Application}
+\[
+\infer[\az rule]
+{\az \Gamma ; \Delta_1, \Delta_2 ; A \lolli B \rightarrow \Xi' ; \Delta' ; \Gamma'}
+{\mz \Gamma ; \Delta_1 \rightarrow A & \dz \Gamma ; \Delta_2; \Delta_1; \cdot ; \cdot ; B \rightarrow \Xi' ; \Delta' ; \Gamma'}
+\]
+
+\[
+\infer[\doz rule]
+{\doz \Gamma ; \Delta ; R, \Phi \rightarrow \Xi' ; \Delta' ; \Gamma'}
+{\az \Gamma ; \Delta ; R \rightarrow \Xi' ; \Delta' ; \Gamma'}
+\]
+   \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+   \frametitle{Proof Theory: HLD}
+   \begin{block}{Match}
+\[
+\infer[\mz 1]
+{\mz \Gamma; \cdot \rightarrow 1}
+{}
+\tab
+\infer[\mz p]
+{\mz \Gamma; p \rightarrow p }
+{}
+\]
+
+\[
+\infer[\mz \bang p]
+{\mz \Gamma, p; \cdot \rightarrow \bang p}
+{}
+\tab
+\infer[\mz \otimes]
+{\mz \Gamma; \Delta_1, \Delta_2 \rightarrow A \otimes B}
+{\mz \Gamma; \Delta_1 \rightarrow A & \mz \Delta_2 \rightarrow B}
+\]
+   \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+   \frametitle{Proof Theory: HLD}
+   \begin{block}{Derivation}
+{\small
+      \[
+\infer[\dz p]
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; p, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; p, \Delta_1 ; \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+\]
+
+\[
+\infer[\dz \bang p]
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; \bang p, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1, p ; \Delta_1 ; \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+\]
+
+\[
+\infer[\dz \otimes]
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; A \otimes B, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; A, B, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+\]
+
+\[
+\infer[\dz 1]
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1; \Delta_1 ; 1, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+{\dz \Gamma ; \Delta ; \Xi ; \Gamma_1; \Delta_1 ; \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+\]
+
+\[
+\infer[\dz end]
+{\dz \Gamma ; \Delta ; \Xi' ; \Gamma' ; \Delta' ; \cdot \rightarrow \Xi' ; \Delta' ; \Gamma'}
+{}
+\]
+}
+   \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+   \frametitle{Proof Theory: HLD}
+   \begin{block}{Derivation}
+{\small
+      \[
+      \infer[\dz comp]
+      {\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; \comp A \lolli B, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+      {\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; 1 \with (A \lolli B \otimes \comp A \lolli B), \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+      \]
+
+      \[
+      \infer[\dz \lolli]
+      {\dz \Gamma ; \Delta_a, \Delta_b ; \Xi ; \Gamma_1 ; \Delta_1 ; A \lolli B, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+      {\mz \Gamma ; \Delta_a \rightarrow A & \dz \Gamma ; \Delta_b ; \Xi, \Delta_a ; \Gamma_1 ; \Delta_1 ; B, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+      \]
+
+      \[
+      \infer[\dz \with L]
+      {\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; A \with B, \Omega \rightarrow \Xi' ; \Delta'; \Gamma'}
+      {\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; A, \Omega \rightarrow \Xi' ; \Delta'; \Gamma'}
+      \]
+
+      \[
+      \infer[\dz \with R]
+      {\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; A \with B, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+      {\dz \Gamma ; \Delta ; \Xi ; \Gamma_1 ; \Delta_1 ; B, \Omega \rightarrow \Xi' ; \Delta' ; \Gamma'}
+      \]
+      }
+   \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+   \frametitle{Proof Theory: LLD}
+   \begin{block}{LLD Semantics Example}
+      \includegraphics<1>[height=6.5cm]{lld1.pdf}
+      \includegraphics<2>[height=6.5cm]{lld2.pdf}
+      \includegraphics<3>[height=6.5cm]{lld3.pdf}
+      \includegraphics<4>[height=6.5cm]{lld4.pdf}
+      \includegraphics<5>[height=6.5cm]{lld5.pdf}
+      \includegraphics<6>[height=6.5cm]{lld6.pdf}
+      \includegraphics<7>[height=6.5cm]{lld7.pdf}
+      \includegraphics<8>[height=6.5cm]{lld8.pdf}
+      \includegraphics<9>[height=6.5cm]{lld9.pdf}
+      \includegraphics<10>[height=6.5cm]{lld10.pdf}
+   \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+   \frametitle{Proof Theory: Soundness Proof}
+   \begin{itemize}
+      \item Every proof/execution performed in LLD can also be done in HLD (soundness)
+      \item Contents of each continuation frame are important:
+      \begin{itemize}
+         \item Remaining terms to match
+         \item Previous matched terms
+         \item Available facts and consumed facts
+         \item Remaining facts to try
+      \end{itemize}
+      \pause
+      \item Critical points of the proof:
+      \begin{itemize}
+         \item Maintaining the well-formedness of the continuation stack at all times
+         \item Stack must be related to a term $A$ (term to prove) and to the initial database
+         \item Comprehensions and databases work by re-using the stack as many times as many backtracks are possible (database iteration!)
+      \end{itemize}
+      \pause
+      \item On the other hand, completeness cannot be proven!
+      \pause
+      \item Connection between the dynamic semantics of LM and linear logic is established
+      \begin{itemize}
+         \item Implementation is close enough to LLD semantics
+      \end{itemize}
+   \end{itemize}
+\end{frame}

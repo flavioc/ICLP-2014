@@ -1,0 +1,237 @@
+\documentclass{beamer}
+
+\usepackage[english]{babel}
+\usepackage{beamerthemeBoadilla}
+%\usepackage{beamerthemeCambridgeUS}
+%\usepackage{beamerthemeRochester}
+%\usepackage{beamerthemeSzeged}
+%\usepackage{beamerthemeMontpellier}
+%\usepackage{beamerthemedefault}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage[utf8]{inputenc}
+\usepackage{multirow}
+\usepackage{fancyvrb}
+\usepackage{proof-dashed}
+\input{macros}
+\input{fp-macros}
+
+\newsavebox{\mysavebox}
+
+\def\Tiny{\fontsize{6pt}{6pt}\selectfont}
+
+\title{A Linear Logic Programming Language for Concurrent Programming over Graph Structures}
+\author[Flávio Cruz]{Flávio Cruz {\small \texttt{<fmfernan@cs.cmu.edu>}}\\
+\scriptsize{\textbf{Authors}:\\
+Flavio Cruz (CMU/UP)\\
+Ricardo Rocha (UP)\\
+Seth Goldstein (CMU)\\
+Frank Pfenning (CMU)}}
+
+\institute[CMU/UP]{Carnegie Mellon University \\ Pittsburgh, PA 15213, USA \and
+CRACS \& INESC TEC, Faculty of Sciences, University Of Porto\\
+Rua do Campo Alegre, 1021/1055, 4169-007 Porto, Portugal}
+\date{\today}
+
+\let\oldalert\alert
+\renewcommand{\alert}[2][]{%
+  \if\relax\detokenize{#1}\relax% http://tex.stackexchange.com/q/53068/5764
+    \oldalert{#2}% Default overlay
+  \else
+    \oldalert<#1>{#2}% Specific overlay
+  \fi}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\AtBeginSection[] { \begin{frame}<beamer>
+\frametitle{Plan} \tableofcontents[currentsection]
+\end{frame}}
+
+\section{Motivation}
+
+\frame
+{
+   \frametitle{The importance of graph-based algorithms}
+   \begin{itemize}
+      \item Graphs are a very general data structure that can represent anything
+      \item The internet has become a huge source of graph-based data:
+      \begin{itemize}
+         \item Web pages
+         \item Social networks
+         \item Online databases (IMDB)
+      \end{itemize}
+      \item Frameworks for manipulating and analyzing graph data:
+      \begin{itemize}
+         \item GraphLab / PowerGraph: machine learning
+         \item Pregel / Giraph (OSS): iterative scalable graph processing
+         \item Ligra: graph processing in shared memory
+      \end{itemize}
+      \item Lack of practical logic-based approaches to tackle these problems
+      \begin{itemize}
+         \item Most of the solutions use imperative paradigms
+         \item Advantages of logic solutions: declarative and amenable to proof
+         \item Harder for designers to make it fast
+      \end{itemize}
+   \end{itemize}
+}
+
+\frame
+{
+   \frametitle{Logic and graphs}
+   \begin{itemize}
+      \item Declarative networking: P2
+      \begin{itemize}
+         \item Datalog-like language for developing network algorithms
+         \item Rules are localized and logical facts are local to a node
+         \item Execution: local computation + communication (messages)
+      \end{itemize}
+      \item Ensemble programming: Meld
+      \begin{itemize}
+         \item Inspired by P2, it was developed for programming ensembles of moving robots
+         \item Innovation: logical facts for sensing and acting on the world
+         \item Uses incremental evaluation and retraction to account for world changes (like P2)
+      \end{itemize}
+      \item \textbf{General graph-based programming: Linear Meld~(LM)}
+      \begin{itemize}
+         \item Language loosely based on Meld that uses Linear Logic as its foundation
+         \item Mutable state can be expressed declaratively
+         \item For general graph-based programming
+         \item Retains sensing facts and action facts for improving program execution but that is not the aim of this talk
+      \end{itemize}
+   \end{itemize}
+}
+
+\section{Linear Meld}
+
+\begin{frame}[fragile]
+   \frametitle{Linear Meld: How does it work?}
+   \begin{itemize}
+      \item Forward-chaining linear logic programming
+      \begin{itemize}
+         \item We start with a set of rules and a database of logical facts
+         \item The database of facts is used to apply more rules
+         \item Program stops when no more information can be derived
+      \end{itemize}
+      \item Facts are also localized on a per-node basis
+      \begin{itemize}
+         \item Nodes can run with any order - no guarantees are given
+         \item Rules are derived locally - no synchronization issues
+      \end{itemize}
+      \item Computation follows a don’t care or committed choice non-determinism
+      \begin{itemize}
+         \item Rules have a pre-defined priority: if there are enough facts, the rule with higher priority will run
+      \end{itemize}
+   \end{itemize}
+\end{frame}
+
+\subsection{Bipartiteness Checking}
+
+\begin{frame}[fragile]
+  \frametitle{Bipartiteness Checking}
+  \begin{columns}[t]
+     \column{.45\textwidth}
+     \begin{block}{Program}
+       \begin{Verbatim}[fontsize=\tiny,commandchars=\\\{\},frame=single]
+\alert[1]{type route edge(node, node).}
+\alert[1]{type linear mark(node, int).}
+\alert[1]{type linear uncolored(node).}
+\alert[1]{type linear colored(node, int).}
+\alert[1]{type linear fail(node).}
+
+fun next(int X) : int =
+   if X <> 1 then 1 else 2 end.
+
+\alert[2,6]{mark(@1, 1).}
+\alert[2]{!edge(@1, @2). !edge(@1, @3).}
+\alert[2]{!edge(@2, @4). !edge(@3, @4).}
+\alert[2]{uncolored(A).}
+
+\alert[3,7,8,9,10]{mark(A, P), uncolored(A)}
+   \alert[3,7,8,9,10]{-o \{B | !edge(A, B) | mark(B, next(P))\},}
+      \alert[3,7,8,9,10]{colored(A, P).}
+
+\alert[4,11]{mark(A, P), colored(A, P)}
+   \alert[4,11]{-o colored(A, P).}
+\alert[5]{mark(A, P1), colored(A, P2), P1 <> P2}
+   \alert[5]{-o fail(A).}
+       \end{Verbatim}
+     \end{block}
+      \column{.5\textwidth}
+      \begin{block}{\only<1>{Predicates}\only<2>{Axiom}\only<3>{First rule}\only<4>{Second rule}\only<5>{Third and fourth rule}\only<6-11>{Execution}}
+         \centering
+         {\scriptsize
+         \only<1>{\begin{itemize}
+                \item The first argument of every predicate must be typed as \texttt{node}.
+                \item Predicates specified as \texttt{route} inform the compiler about the graph data structure.
+                \item Predicates specified as \texttt{linear} turns facts of the predicate into linear facts, which can be asserted or retracted.
+                \item Predicates not specified as \texttt{linear} are persistent.
+                \item Nodes are either \texttt{colored/2} or \texttt{uncolored/1}.
+             \end{itemize}}
+         \only<2>{\begin{itemize}
+                \item Axioms are rules without bodies that are added to the database as soon as the program starts.
+                \item Node literals are written as \texttt{@X}, where \texttt{X} is the node number.
+             \end{itemize}}
+         \only<3>{\begin{itemize}
+               \item If a node is scheduled to be \texttt{mark/1}'ed and is \texttt{uncolored/1}, then we can assign the color \texttt{P} to the node by deriving \texttt{colored(A,P)}.
+               \item We use a comprehension to mark the neighbor nodes \\
+               \texttt{\{B|!edge(A,B)|mark(B,next(P))\}}:
+               \begin{itemize}
+                  \item {\tiny For every \texttt{!edge(A, B)} in the database we derive a \texttt{mark(B,next(P))}.}
+                  \item {\tiny With \texttt{next(P)} we attempt to color the neighbor node with the opposite color.}
+               \end{itemize}
+         \end{itemize}}
+         \only<4>{\begin{itemize}
+            \item If a node is to be marked with color \texttt{P} and has color \texttt{P}, then we keep it that way.
+         \end{itemize}}
+         \only<5>{\begin{itemize}
+            \item However, if the colors are different then we derive \texttt{fail/1}.
+            \item ... same if the coloring process has already failed.
+         \end{itemize}}
+         \only<6-11>{
+         \begin{figure}[ht]
+            \includegraphics<6>[height=4.5cm]{bipartiteness1.pdf}
+            \includegraphics<7>[height=4.5cm]{bipartiteness2.pdf}
+            \includegraphics<8>[height=4.5cm]{bipartiteness3.pdf}
+            \includegraphics<9>[height=4.5cm]{bipartiteness4.pdf}
+            \includegraphics<10>[height=4.5cm]{bipartiteness5.pdf}
+            \includegraphics<11>[height=4.5cm]{bipartiteness6.pdf}
+         \end{figure}
+         }
+      }
+      \end{block}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+   \frametitle{Concurrency}
+   \begin{center}
+      \includegraphics[height=7cm]{graph_coordination.pdf}
+   \end{center}
+\end{frame}
+
+\input{quicksort}
+
+\begin{frame}[fragile]
+   \frametitle{Other uses of Linear Meld}
+   \begin{itemize}
+      \item Belief Propagation, Splash Belief Propagation
+      \item Neural Networks
+      \item MiniMax
+      \item N-Queens
+      \item PageRank
+      \item Graph algorithms: shortest path, search, coloring, ...
+   \end{itemize}
+\end{frame}
+
+\input{proofs}
+
+\begin{frame}{Thank You}
+\begin{center}
+{\Huge Thank you for your time!}
+\end{center}
+\end{frame}
+
+\end{document}
+

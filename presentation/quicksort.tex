@@ -1,0 +1,92 @@
+
+\subsection{Quick-Sort}
+
+\begin{frame}[fragile]
+  \frametitle{Quick-Sort}
+  \begin{columns}[t]
+       \column{.45\textwidth}
+       \begin{block}{Program}
+         \begin{Verbatim}[fontsize=\tiny,frame=single,commandchars=\\\{\}]
+\alert[1]{down(@0, tosort).}
+
+\alert[2]{down(A, [])}
+   \alert[2]{-o up(A, []).}
+\alert[2]{down(A, [X])}
+   \alert[2]{-o up(A, [X]).}
+\alert[2]{down(A, [X, Y]),}
+\alert[2]{X < Y}
+   \alert[2]{-o up(A, [X, Y]).}
+\alert[2]{down(A, [X, Y]),}
+\alert[2]{X >= Y}
+   \alert[2]{-o up(A, [Y, X]).}
+\alert[3]{down(A, [X | L])}
+   \alert[3]{-o buildpivot(A, L, X, [], []).}
+         \end{Verbatim}
+      \end{block}
+      \column{.5\textwidth}
+      \begin{block}{Explanation}
+         {\scriptsize
+         \begin{itemize}
+            \only<1>{\item The quick-sort program starts with a single node and dynamically builds the graph of nodes}
+            \only<1>{\item A node receives an unsorted list in the second argument of \texttt{down/2} and must generate an \texttt{up/2} fact after sorting the list}
+            \only<2>{\item In the base cases, the list can be immediately sorted}
+            \only<3>{\item In the recursive case, we split the list...}
+         \end{itemize}
+         }
+      \end{block}
+   \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Quick-Sort}
+  \begin{columns}[t]
+       \column{.5\textwidth}
+       \begin{block}{Program}
+         \begin{Verbatim}[fontsize=\tiny,frame=single,commandchars=\\\{\}]
+\alert[2]{buildpivot(A, [], X, Smaller, Greater)}
+   \alert[2]{-o exists B, C. (back(B, A), down(B, Smaller),}
+            \alert[2]{back(C, A), down(C, Greater),}
+            \alert[2]{waitpivot(A, B, C, X)).}
+
+\alert[1]{buildpivot(A, [Y | L], X, Smaller, Greater),}
+\alert[1]{Y <= X}
+   \alert[1]{-o buildpivot(A, L, X, [Y | Smaller], Greater).}
+\alert[1]{buildpivot(A, [Y | L], X, Smaller, Greater),}
+\alert[1]{Y > X}
+   \alert[1]{-o buildpivot(A, L, X, Smaller, [Y | Greater]).}
+
+\alert[3]{waitpivot(A, NodeSmaller, NodeGreater, Pivot),}
+\alert[3]{sorted(A, NodeSmaller, Smaller),}
+\alert[3]{sorted(A, NodeGreater, Greater)}
+   \alert[3]{-o append(A, Smaller, [Pivot | Greater]).}
+   
+\alert[3]{up(A, L), back(A, B) -o sorted(B, A, L).}
+         \end{Verbatim}
+      \end{block}
+      \column{.45\textwidth}
+      \begin{block}{Explanation}
+         {\scriptsize
+         \begin{itemize}
+            \only<1>{\item \texttt{buildpivot/4} will split the list: elements less or equal than \texttt{X} in the fourth argument and elements greater than \texttt{X} in the fifth argument}
+            \only<2>{\item Once the list is split, we create nodes \texttt{B} and \texttt{C} that will sort the two sub-lists
+            \item \texttt{waitpivot} is then used to wait for the sorted lists from \texttt{B} and \texttt{C}}
+            \only<3>{\item Nodes \texttt{B} and \texttt{C} send a \texttt{sorted/3} fact to \texttt{A}
+            \item Results are then appended and sent recursively to the root node}
+         \end{itemize}
+         }
+      \end{block}
+   \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Quick-Sort}
+  \begin{block}{Example Execution}
+     \begin{figure}
+        \includegraphics<1>[height=4.5cm]{quicksort1.pdf}
+        \includegraphics<2>[height=4.5cm]{quicksort2.pdf}
+        \includegraphics<3>[height=4.5cm]{quicksort3.pdf}
+        \includegraphics<4>[height=4.5cm]{quicksort4.pdf}
+        \includegraphics<5>[height=4.5cm]{quicksort5.pdf}
+     \end{figure}
+  \end{block}
+\end{frame}
