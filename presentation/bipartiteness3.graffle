@@ -348,13 +348,22 @@
 			<integer>11</integer>
 			<key>Points</key>
 			<array>
-				<string>{280.31992190983203, 99.724825760258156}</string>
-				<string>{279.76284138308358, 194.2751742397474}</string>
+				<string>{280.30519243249734, 102.22478244506847}</string>
+				<string>{279.76284138220592, 194.27517423974365}</string>
 			</array>
 			<key>Style</key>
 			<dict>
 				<key>stroke</key>
 				<dict>
+					<key>Color</key>
+					<dict>
+						<key>b</key>
+						<string>1</string>
+						<key>g</key>
+						<string>0</string>
+						<key>r</key>
+						<string>0</string>
+					</dict>
 					<key>HeadArrow</key>
 					<string>Arrow</string>
 					<key>Legacy</key>
@@ -509,7 +518,7 @@ uncolored(@3)}</string>
 			<key>Points</key>
 			<array>
 				<string>{115.33448122246158, 55.112693237548186}</string>
-				<string>{228.66551839741899, 55.112693237548186}</string>
+				<string>{226.16551844713516, 55.112693237548186}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -571,6 +580,8 @@ uncolored(@3)}</string>
 						<key>r</key>
 						<string>0.740704</string>
 					</dict>
+					<key>Width</key>
+					<real>6</real>
 				</dict>
 			</dict>
 			<key>Text</key>
@@ -675,7 +686,7 @@ uncolored(@3)}</string>
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2014-04-23 01:44:16 +0000</string>
+	<string>2014-07-18 12:02:56 +0000</string>
 	<key>Modifier</key>
 	<string>Flavio Cruz</string>
 	<key>NotesVisible</key>
@@ -766,7 +777,7 @@ uncolored(@3)}</string>
 			</dict>
 		</array>
 		<key>Frame</key>
-		<string>{{478, -299}, {693, 808}}</string>
+		<string>{{478, 74}, {693, 804}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
@@ -780,7 +791,7 @@ uncolored(@3)}</string>
 		<key>SidebarWidth</key>
 		<integer>120</integer>
 		<key>VisibleRegion</key>
-		<string>{{0, 0}, {558, 669}}</string>
+		<string>{{0, 0}, {558, 665}}</string>
 		<key>Zoom</key>
 		<real>1</real>
 		<key>ZoomValues</key>

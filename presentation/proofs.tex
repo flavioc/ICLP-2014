@@ -20,7 +20,7 @@
             \item Comprehensions are maximally applied
          \end{itemize}
       \end{itemize}
-      \item The semantics model a single rule application:
+      \item The semantics model a single rule application at the node level:
       \begin{itemize}
          \item Input: Linear context ($\Delta$), Persistent Context ($\Gamma$), Rules ($\Phi$)
          \item Output: Derived Linear context ($\Delta'$), Derived Persistent context ($\Gamma'$), Consumed Linear context ($\Xi'$)
@@ -165,16 +165,13 @@
          \item Available facts and consumed facts
          \item Remaining facts to try
       \end{itemize}
-      \pause
       \item Critical points of the proof:
       \begin{itemize}
          \item Maintaining the well-formedness of the continuation stack at all times
          \item Stack must be related to a term $A$ (term to prove) and to the initial database
-         \item Comprehensions and databases work by re-using the stack as many times as many backtracks are possible (database iteration!)
+         %\item Comprehensions and databases work by re-using the stack as many times as many backtracks are possible (database iteration!)
       \end{itemize}
-      \pause
       \item On the other hand, completeness cannot be proven!
-      \pause
       \item Connection between the dynamic semantics of LM and linear logic is established
       \begin{itemize}
          \item Implementation is close enough to LLD semantics

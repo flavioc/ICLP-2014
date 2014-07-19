@@ -348,8 +348,8 @@
 			<integer>11</integer>
 			<key>Points</key>
 			<array>
-				<string>{280.31994645414125, 99.724825866034038}</string>
-				<string>{279.76291794626019, 194.27517456976378}</string>
+				<string>{280.3199244319714, 99.724825771127968}</string>
+				<string>{279.76284925061009, 194.27517427365518}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -385,13 +385,22 @@
 			<integer>10</integer>
 			<key>Points</key>
 			<array>
-				<string>{63.417235745371215, 99.725394489550197}</string>
+				<string>{63.417235745371215, 102.22539447831795}</string>
 				<string>{63.417235745371215, 194.27459603008225}</string>
 			</array>
 			<key>Style</key>
 			<dict>
 				<key>stroke</key>
 				<dict>
+					<key>Color</key>
+					<dict>
+						<key>b</key>
+						<string>1</string>
+						<key>g</key>
+						<string>0</string>
+						<key>r</key>
+						<string>0</string>
+					</dict>
 					<key>HeadArrow</key>
 					<string>Arrow</string>
 					<key>Legacy</key>
@@ -506,13 +515,22 @@ uncolored(@3)}</string>
 			<integer>7</integer>
 			<key>Points</key>
 			<array>
-				<string>{115.33448122246158, 55.112693237548186}</string>
+				<string>{117.83448117274543, 55.112693237548186}</string>
 				<string>{228.66551839741899, 55.112693237548186}</string>
 			</array>
 			<key>Style</key>
 			<dict>
 				<key>stroke</key>
 				<dict>
+					<key>Color</key>
+					<dict>
+						<key>b</key>
+						<string>1</string>
+						<key>g</key>
+						<string>0</string>
+						<key>r</key>
+						<string>0</string>
+					</dict>
 					<key>HeadArrow</key>
 					<string>Arrow</string>
 					<key>Legacy</key>
@@ -619,6 +637,8 @@ uncolored(@2)}</string>
 						<key>r</key>
 						<string>0.718059</string>
 					</dict>
+					<key>Width</key>
+					<real>6</real>
 				</dict>
 			</dict>
 			<key>Text</key>
@@ -682,7 +702,7 @@ uncolored(@2)}</string>
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2014-04-23 01:42:03 +0000</string>
+	<string>2014-07-18 12:02:18 +0000</string>
 	<key>Modifier</key>
 	<string>Flavio Cruz</string>
 	<key>NotesVisible</key>
@@ -773,7 +793,7 @@ uncolored(@2)}</string>
 			</dict>
 		</array>
 		<key>Frame</key>
-		<string>{{763, 70}, {693, 808}}</string>
+		<string>{{747, 74}, {693, 804}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
@@ -787,7 +807,7 @@ uncolored(@2)}</string>
 		<key>SidebarWidth</key>
 		<integer>120</integer>
 		<key>VisibleRegion</key>
-		<string>{{0, 0}, {558, 669}}</string>
+		<string>{{0, 0}, {558, 665}}</string>
 		<key>Zoom</key>
 		<real>1</real>
 		<key>ZoomValues</key>
